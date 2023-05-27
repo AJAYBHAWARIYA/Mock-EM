@@ -4,7 +4,7 @@ import SwiftUI
 struct FakeVoiceApp: App {
     var body: some Scene {
         WindowGroup {
-            HomePage2()
+            HomePage()
         }
     }
 }

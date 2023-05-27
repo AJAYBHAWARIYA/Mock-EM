@@ -47,7 +47,7 @@ struct NewButtonSet: View {
                         Circle()
                             .frame(maxWidth: 60,maxHeight:60)
                             .scaleEffect(isRecording ? 2.0 : 1.0)
-                            .foregroundColor(isRecording ? Color.red : Color.blue)
+                            .foregroundColor(Color.red)
                         
                         Image(systemName: "mic.fill")
                             .font(.system(size: 40))
