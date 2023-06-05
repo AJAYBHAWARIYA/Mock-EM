@@ -4,28 +4,22 @@ import AVFoundation
 
 struct HomePage: View {
     private var voiceObj = voiceClass()
-    @State var names: [voice] = []
+    
+    @State private var names: [voice] = []
     @State private var searchText = ""
     @State private var pickerSelect: voice = voice(model_token: "", title: "", user_ratings: rating(positive_count: 0, total_count: 0))
     @State var tts: String = ""
     @State var val = false
-    @State var chut: String = ""
+    @State var inferenceToken: String = ""
     @State var pollObj: pollParams = pollParams()
     @State var player: AVPlayer = AVPlayer()
     @State var showTextInput : Bool = false
     @State var showRecordAnim : Bool = false
+    @State private var isRecording : Bool = false
     
-    @GestureState var isRecording : Bool = false
-    
+    @StateObject var record = Recording()
     
     var body: some View {
-        
-        let longPress = LongPressGesture(minimumDuration: .infinity)
-            .updating($isRecording) {
-                currentState, gestureState, transaction in
-                gestureState = currentState
-                transaction = Transaction(animation: .spring( response: 0.5 , dampingFraction: 0.05).speed(0.5))
-            }
         
         VStack{
             // Voice search Input
@@ -59,7 +53,7 @@ struct HomePage: View {
                 }
                 .pickerStyle(.wheel)
                 .onChange(of: searchResults, perform: {searchResults in if (!searchResults.isEmpty) {pickerSelect = searchResults[0]}})
-                .onChange(of: pickerSelect, perform: {_ in chut = ""; pollObj.maybe_public_bucket_wav_audio_path! = "" })
+                .onChange(of: pickerSelect, perform: {_ in inferenceToken = ""; pollObj.maybe_public_bucket_wav_audio_path! = "" })
             }
             
             // Choice Buttons
@@ -76,35 +70,43 @@ struct HomePage: View {
                             .padding(.horizontal,30)
                             .foregroundColor(.black)
                             .searchable(text: $tts)
-                            .onChange(of: tts, perform: {_ in chut = ""; pollObj.maybe_public_bucket_wav_audio_path! = "" })
+                            .onChange(of: tts, perform: {_ in inferenceToken = ""; pollObj.maybe_public_bucket_wav_audio_path! = "" })
                     }
                     Button("Cancel"){
                         showTextInput.toggle()
                     }.padding(.trailing, 30)
                 }
                 else if(showRecordAnim){
-                    ZStack{
-                        
-                        //                        Circle()
-                        //                            .frame(maxWidth: 65, maxHeight:65)
-                        //                            .foregroundColor(Color.blue)
-                        
-                        Circle()
-                            .frame(maxWidth: 60,maxHeight:60)
-                            .scaleEffect(isRecording ? 2.0 : 1.0)
-                            .foregroundColor( Color.red )
-                        
-                        Image(systemName: "mic.fill")
-                            .font(.system(size: 40))
-                            .foregroundColor(.primary)
-                            .padding()
-                    }
-                    .onTapGesture {
+                    
+                    Button(action: {
+                        isRecording = false
+                        record.handleRecording(start: isRecording )
+                        tts = record.transcript
+                        print("DONE WITH THE PRESS")
                         showRecordAnim.toggle()
+                    }) {
+                        ZStack{
+                            Circle()
+                                .frame(maxWidth: 60, maxHeight:60)
+                                .scaleEffect(isRecording ? 2.0 : 1.0)
+                                .foregroundColor( Color.red )
+                                .animation(.easeIn(duration: 2), value: isRecording)
+                            
+                            
+                            Image(systemName: "mic.fill")
+                                .font(.system(size: 40))
+                                .foregroundColor(.primary)
+                                .padding()
+                        }
                     }
-                    .gesture(longPress)
-                    
-                    
+                    .simultaneousGesture(
+                        LongPressGesture(minimumDuration: 0.2)
+                        .onEnded {_ in
+                            isRecording = true
+                            record.handleRecording(start: isRecording )
+                            print("ENDED")
+                        }
+                    )
                 }
                 else{
                     Image(systemName: "keyboard.fill")
@@ -121,7 +123,6 @@ struct HomePage: View {
                     Image(systemName: "mic.square.fill")
                         .foregroundColor(.blue)
                         .font(.system(size: 40))
-                    //.border(.black)
                         .padding(.horizontal, 40)
                         .onTapGesture{
                             showRecordAnim.toggle()
@@ -132,34 +133,25 @@ struct HomePage: View {
             
             Spacer()
             //Buttons for request and play
-            if(chut == ""){
+            if(inferenceToken == ""){
                 Button{
-                    if(pickerSelect.title == ""){
-                        val = true
+                Task{
+                    do{
+                        inferenceToken = try await voiceObj.ttsRequest(tts_model: pickerSelect.model_token, textToConvert: tts, uuid: UUID().uuidString)!
+                        pollObj = try await voiceObj.pollRequest(inference_job_token: inferenceToken)!
+                    } catch {
+                        print("tts failed")
                     }
-                    else{
-                        Task{
-                            do{
-                                chut = try await voiceObj.ttsRequest(tts_model: pickerSelect.model_token, textToConvert: tts, uuid: UUID().uuidString)!
-                                pollObj = try await voiceObj.pollRequest(inference_job_token: chut)!
-                            } catch {
-                                print("tts failed")
-                            }
-                        }
-                    }
-                } label: {
+                }} label: {
                     Image(systemName: "arrow.up.circle.fill")
                         .font(.system(size:60))
-                }
-                .alert(isPresented: $val) {
-                    Alert(title: Text("Pick a voice"))
                 }
             }
             else if(pollObj.maybe_public_bucket_wav_audio_path! == ""){
                 ProgressView().progressViewStyle(.circular)
                     .font(.system(size: 60))
             }
-            else{
+            else {
                 Button{
                     player = AVPlayer(url: URL(string: ("https://storage.googleapis.com/vocodes-public" + (pollObj.maybe_public_bucket_wav_audio_path!)))!)
                     player.play()
@@ -167,18 +159,13 @@ struct HomePage: View {
                     Image(systemName: "play.fill")
                         .font(.system(size: 60))
                 }
-                
-                //video duration for playtime progress view
-                Text("\(player.currentItem?.duration.seconds ?? 0)")
+//                Text("\(player.currentItem?.duration.seconds ?? 0)")
                 
             }
-            let link = URL(string: ("https://storage.googleapis.com/vocodes-public" + (pollObj.maybe_public_bucket_wav_audio_path!)))!
+//            let link = URL(string: ("https://storage.googleapis.com/vocodes-public" + (pollObj.maybe_public_bucket_wav_audio_path!)))!
             
-            ShareLink(item: link, message: Text("Learn Swift here!"))
-                .font(.largeTitle)
-            
-            //            Trans
-            
+//            ShareLink(item: link, message: Text("Learn Swift here!"))
+//                .font(.largeTitle)
             
         }.onAppear(perform: {
             Task{

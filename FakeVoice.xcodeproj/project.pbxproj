@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6A57DC232A20053B009700E2 /* Anim.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A57DC222A20053B009700E2 /* Anim.swift */; };
-		6A57DC252A201858009700E2 /* NewButtonSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A57DC242A201858009700E2 /* NewButtonSet.swift */; };
+		E17B6E7A2A22CBB6005BC20C /* Recording.swift in Sources */ = {isa = PBXBuildFile; fileRef = E17B6E792A22CBB6005BC20C /* Recording.swift */; };
 		E18B70162A1DB42600394DBD /* FakeVoiceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E18B70152A1DB42600394DBD /* FakeVoiceApp.swift */; };
 		E18B701A2A1DB42600394DBD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E18B70192A1DB42600394DBD /* Assets.xcassets */; };
 		E18B701D2A1DB42600394DBD /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E18B701C2A1DB42600394DBD /* Preview Assets.xcassets */; };
@@ -19,7 +19,7 @@
 
 /* Begin PBXFileReference section */
 		6A57DC222A20053B009700E2 /* Anim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Anim.swift; sourceTree = "<group>"; };
-		6A57DC242A201858009700E2 /* NewButtonSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewButtonSet.swift; sourceTree = "<group>"; };
+		E17B6E792A22CBB6005BC20C /* Recording.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recording.swift; sourceTree = "<group>"; };
 		E18B70122A1DB42600394DBD /* FakeVoice.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FakeVoice.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E18B70152A1DB42600394DBD /* FakeVoiceApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeVoiceApp.swift; sourceTree = "<group>"; };
 		E18B70192A1DB42600394DBD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -62,11 +62,11 @@
 				E18B70262A1DB45200394DBD /* File.swift */,
 				E18B70232A1DB45200394DBD /* HomePage.swift */,
 				6A57DC222A20053B009700E2 /* Anim.swift */,
-				6A57DC242A201858009700E2 /* NewButtonSet.swift */,
 				E18B70242A1DB45200394DBD /* Voice List.swift */,
 				E18B70152A1DB42600394DBD /* FakeVoiceApp.swift */,
 				E18B70192A1DB42600394DBD /* Assets.xcassets */,
 				E18B701B2A1DB42600394DBD /* Preview Content */,
+				E17B6E792A22CBB6005BC20C /* Recording.swift */,
 			);
 			path = FakeVoice;
 			sourceTree = "<group>";
@@ -149,11 +149,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6A57DC252A201858009700E2 /* NewButtonSet.swift in Sources */,
 				6A57DC232A20053B009700E2 /* Anim.swift in Sources */,
 				E18B702A2A1DB45200394DBD /* File.swift in Sources */,
 				E18B70282A1DB45200394DBD /* Voice List.swift in Sources */,
 				E18B70272A1DB45200394DBD /* HomePage.swift in Sources */,
+				E17B6E7A2A22CBB6005BC20C /* Recording.swift in Sources */,
 				E18B70162A1DB42600394DBD /* FakeVoiceApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -286,6 +286,10 @@
 				DEVELOPMENT_TEAM = PY9AT75T9D;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FakeVoice/Info.plist;
+				INFOPLIST_KEY_NSFileProviderDomainUsageDescription = "";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -315,6 +319,10 @@
 				DEVELOPMENT_TEAM = PY9AT75T9D;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FakeVoice/Info.plist;
+				INFOPLIST_KEY_NSFileProviderDomainUsageDescription = "";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

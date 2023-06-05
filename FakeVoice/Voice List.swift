@@ -56,6 +56,8 @@ class voiceClass{
     func ttsRequest(tts_model: String, textToConvert: String, uuid: String) async throws -> String?{
         let params = ["tts_model_token": tts_model, "inference_text": textToConvert, "uuid_idempotency_token": uuid]
         
+        print("tts: ", textToConvert)
+        
         guard let encoded = try? JSONEncoder().encode(params) else {
             return ""
         }
@@ -72,6 +74,8 @@ class voiceClass{
     }
     
     func pollRequest(inference_job_token: String) async throws -> pollParams?{
+        
+        print("inference_token: ", inference_job_token)
 
         let pollUrl = URL(string: (pollBaseUrl + inference_job_token))!
 
@@ -98,13 +102,4 @@ class voiceClass{
         }
         return decodedResponse?.state
     }
-    
-    func playVoice(url: String){
-        let soundUrl = URL(string: ("https://storage.googleapis.com/vocodes-public" + url))!
-        let player = AVPlayer(url: soundUrl)
-        player.play()
-    }
 }
-
-//Hello! What’s up! Hope you are doing great!
-//Hello Nation. I’m the president of the United States.
