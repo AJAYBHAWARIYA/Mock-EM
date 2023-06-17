@@ -38,7 +38,10 @@ class Recording:  NSObject, ObservableObject, AVAudioPlayerDelegate {
                 var isFinal = false
                 
                 if let result = result {
-                    self.transcript = result.bestTranscription.formattedString
+                    let tempTranscript = result.bestTranscription.formattedString
+                    if tempTranscript.count != 0 {
+                        self.transcript = tempTranscript
+                    }
                     isFinal = result.isFinal
                     
                     print("Text \(result.bestTranscription.formattedString)")
