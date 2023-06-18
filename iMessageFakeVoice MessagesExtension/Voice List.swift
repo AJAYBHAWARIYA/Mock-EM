@@ -124,12 +124,10 @@ class voiceClass : ObservableObject{
             decodedResponse = try? JSONDecoder().decode(pollRes.self, from: data)
             count += 1
             
-            //Test Voice Output
-            
-            if(count == WAIT_COUNT){
-                decodedResponse?.state = pollParams(maybe_result_token: "OOps", maybe_public_bucket_wav_audio_path: "/tts_inference_output/9/c/d/vocodes_9cdd9865-0e10-48f0-9a23-861118ec3286.wav",status: "complete_success")
-                break;
-            }
+//            if(count == WAIT_COUNT){
+//                decodedResponse?.state = pollParams(maybe_result_token: "OOps", maybe_public_bucket_wav_audio_path: "/tts_inference_output/9/c/d/vocodes_9cdd9865-0e10-48f0-9a23-861118ec3286.wav",status: "complete_success")
+//                break;
+//            }
         }
         isDisabled = false
         return decodedResponse?.state

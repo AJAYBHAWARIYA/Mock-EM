@@ -147,22 +147,6 @@ class MessagesViewController: MSMessagesAppViewController {
         loadContentView()
     }
     
-    override func didTransition(to presentationStyle: MSMessagesAppPresentationStyle) {
-        super.didTransition(to: presentationStyle)
-//        if(presentationStyle == .compact){
-//            DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
-//                self.requestPresentationStyle(.transcript)
-//            })
-//        }
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-//        DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
-//            self.requestPresentationStyle(.expanded)
-//        })
-    }
-    
     override func didResignActive(with conversation: MSConversation) {
         // os_log("didResignActive()...", log: .default, type: .debug)
         
@@ -178,15 +162,17 @@ final class ContentViewHostController: UIHostingController<ContentView> {
         viewRequestFunc: @escaping () -> Void
     ) {
         self.viewRequestFunc = viewRequestFunc
-        super.init(rootView: ContentView(viewRequestFunc: viewRequestFunc))
+        super.init(rootView: ContentView(
+            viewRequestFunc: viewRequestFunc
+        ))
         rootView.submitMessage = submitMessage
-
     }
     
     @MainActor required dynamic init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    //    required init?(coder: NSCoder) {
+    
+//    required init?(coder: NSCoder) {
 //        super.init(coder: coder, rootView: ContentView())
 //    }
     
@@ -204,9 +190,11 @@ final class ContentViewHostController: UIHostingController<ContentView> {
 struct ContentView: View {
     var viewRequestFunc: () -> Void
     var submitMessage: (() -> Void)?
+    @StateObject var networkMonitor = NetworkMonitor()
     
     var body: some View {
         HomePage(viewRequest: viewRequestFunc)
+            .environmentObject(networkMonitor)
     }
 }
 

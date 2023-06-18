@@ -16,58 +16,58 @@ struct ProgressAnim: View {
     var body: some View {
         HStack{
             VStack{
-                textView(value: data.x[0], font: Font.title3, delay: 0.0)
+                BinaryTextView(value: data.x[0], font: Font.title3, delay: 0.0)
             }
             
             VStack{
                 ForEach(1...3, id: \.self){
                     i in
-                    textView(value: data.x[i], font: Font.title2, delay: 0.1)
+                    BinaryTextView(value: data.x[i], font: Font.title2, delay: 0.1)
                 }
             }
             
             VStack{
                 ForEach(4...8, id: \.self){
                     i in
-                    if(i == 4 || i == 8){textView(value: data.x[i], font: Font.title3, delay: 0.2)}
-                    else if(i == 5 || i == 7){textView(value: data.x[i], font: Font.title2, delay: 0.2)}
-                    else{textView(value: data.x[i], font: Font.title, delay: 0.2)}
+                    if(i == 4 || i == 8){BinaryTextView(value: data.x[i], font: Font.title3, delay: 0.2)}
+                    else if(i == 5 || i == 7){BinaryTextView(value: data.x[i], font: Font.title2, delay: 0.2)}
+                    else{BinaryTextView(value: data.x[i], font: Font.title, delay: 0.2)}
                 }
             }
             
             VStack{
                 ForEach(9...13, id: \.self){
                     i in
-                    if(i == 9 || i == 13){textView(value: data.x[i], font: Font.title2, delay: 0.3)}
-                    else if(i == 10 || i == 12){textView(value: data.x[i], font: Font.title, delay: 0.3)}
-                    else{textView(value: data.x[i], font: Font.largeTitle, delay: 0.3)}
+                    if(i == 9 || i == 13){BinaryTextView(value: data.x[i], font: Font.title2, delay: 0.3)}
+                    else if(i == 10 || i == 12){BinaryTextView(value: data.x[i], font: Font.title, delay: 0.3)}
+                    else{BinaryTextView(value: data.x[i], font: Font.largeTitle, delay: 0.3)}
                 }
             }
             
             VStack{
                 ForEach(14...18, id: \.self){
                     i in
-                    if(i == 14 || i == 18){textView(value: data.x[i], font: Font.title3, delay: 0.4)}
-                    else if(i == 15 || i == 17){textView(value: data.x[i], font: Font.title2, delay: 0.4)}
-                    else{textView(value: data.x[i], font: Font.title, delay: 0.4)}
+                    if(i == 14 || i == 18){BinaryTextView(value: data.x[i], font: Font.title3, delay: 0.4)}
+                    else if(i == 15 || i == 17){BinaryTextView(value: data.x[i], font: Font.title2, delay: 0.4)}
+                    else{BinaryTextView(value: data.x[i], font: Font.title, delay: 0.4)}
                 }
             }
             
             VStack{
                 ForEach(19...21, id: \.self){
                     i in
-                    textView(value: data.x[i], font: Font.title2, delay: 0.5)
+                    BinaryTextView(value: data.x[i], font: Font.title2, delay: 0.5)
                 }
             }
             
             VStack{
-                textView(value: data.x[22], font: Font.title3, delay: 0.6)
+                BinaryTextView(value: data.x[22], font: Font.title3, delay: 0.6)
             }
         }
     }
 }
 
-struct textView : View{
+struct BinaryTextView : View{
     
     @State var value : String
     var font: Font
@@ -96,3 +96,9 @@ struct textView : View{
             }
     }
 }
+
+//struct GradientLoader : View{
+//    var body: some View{
+//        
+//    }
+//}
