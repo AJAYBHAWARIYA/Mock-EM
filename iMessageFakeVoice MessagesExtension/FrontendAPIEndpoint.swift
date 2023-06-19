@@ -10,9 +10,13 @@
 //class FrontendAPIEndpoint: ObservableObject {
 //    @Published private(set) var queue = 0
 //    private var voiceObj : voiceClass
+//    private var inferenceToken : String
+//    private var pollObj : pollParams
 //    
-//    init(voiceObj : voiceClass){
+//    init(voiceObj : voiceClass, inferenceToken: inout String, pollObj: inout pollParams){
 //        self.voiceObj = voiceObj
+//        self.inferenceToken = inferenceToken
+//        self.pollObj = pollObj
 //    }
 //    
 //    func getQueue(){

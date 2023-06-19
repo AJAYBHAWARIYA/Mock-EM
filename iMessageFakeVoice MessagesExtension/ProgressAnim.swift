@@ -81,6 +81,7 @@ struct BinaryTextView : View{
             .fontWeight(.bold)
             .font(font)
             .opacity(visible ? 1 : 0)
+            .foregroundStyle(Color.purple)
             .onAppear{
                 withAnimation(
                     .easeIn
@@ -97,8 +98,39 @@ struct BinaryTextView : View{
     }
 }
 
-//struct GradientLoader : View{
-//    var body: some View{
-//        
-//    }
-//}
+struct GradientLoader : View{
+    @State var transition1 = -1.0
+    @State var transition2 = 1.0
+    private var timer = Timer.publish(every: 0.025, on: .main, in: .common).autoconnect()
+    
+    var body: some View{
+        Rectangle()
+//            .frame(width: 400, height: 100, alignment: .center)
+            .cornerRadius(10)
+            .foregroundStyle(
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.black,
+                        Color.purple
+                    ]),
+                    startPoint: UnitPoint(x: CGFloat(transition1), y: 1),
+                    endPoint: UnitPoint(x: CGFloat(transition2), y: 1)
+                )
+            )
+            .opacity(0.3)
+            .onReceive(timer, perform: { _ in
+                if(transition1 == 1.0){
+                    transition2 = round((transition2 + 0.025)*1000)/1000
+                    if(transition2 == 1.0){
+                        transition1 = -1.0
+                    }
+                }
+                if(transition2 == 1.0){
+                    transition1 = round((transition1 + 0.025)*1000)/1000
+                    if(transition1 == 1.0){
+                        transition2 = -1.0
+                    }
+                }
+            })
+    }
+}

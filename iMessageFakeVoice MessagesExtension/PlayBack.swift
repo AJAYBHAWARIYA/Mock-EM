@@ -68,10 +68,12 @@ struct PlayBack: View {
                 }
             }label: {
                 if(isPlaying){
-                    Image(systemName: "pause.fill").font(.system(size: 50))
+                    Image(systemName: "pause.fill").font(.system(size: 40))
+                        .foregroundStyle(Color.purple)
                 }
                 else{
-                    Image(systemName: "play.fill").font(.system(size: 50))
+                    Image(systemName: "play.fill").font(.system(size: 40))
+                        .foregroundStyle(Color.purple)
                 }
             }
             .onReceive(timer, perform: { _ in

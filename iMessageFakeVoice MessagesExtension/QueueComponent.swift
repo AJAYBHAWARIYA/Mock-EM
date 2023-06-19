@@ -22,9 +22,9 @@ struct QueueComponent: View{
     var body: some View{
         RoundedRectangle(cornerRadius: 12)
             .foregroundStyle(
-                queue <= 60 ? Color.blue :
-                    queue <= 120 ? Color(red: 255/255, green: 214/255, blue: 0) :
-                    Color.red
+                queue <= 60 ? Color(red: 0, green: 200/255, blue: 83/255) :
+                    queue <= 120 ? Color(red: 204/255, green: 172/255, blue: 2/255) :
+                    Color(red:221/255, green: 44/255, blue: 0)
             )
             .frame(maxWidth: 120, maxHeight: 40)
             .overlay{

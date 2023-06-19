@@ -6,6 +6,7 @@ struct HomePage: View {
     var viewRequest : () -> Void
     
     @StateObject private var voiceObj = voiceClass()
+//    @StateObject private var API = FrontendAPIEndpoint(voiceObj: voiceClass(), inferenceToken: &self.s, pollObj: &pollParams())
     @StateObject var record = Recording()
     
     @State private var names: [voice] = []
@@ -24,7 +25,8 @@ struct HomePage: View {
     
     @EnvironmentObject var networkMonitor: NetworkMonitor
 
-    @FocusState private var nameIsFocused: Bool
+    @FocusState private var voiceIsFocused: Bool
+    @FocusState private var ttsIsFocused: Bool
     
     var body: some View {
         let iosPotrait = (horizontalSizeClass == .compact && verticalSizeClass == .regular)
@@ -41,7 +43,7 @@ struct HomePage: View {
                             
                             ZStack{
                                 Capsule().frame(maxHeight: 40)
-                                    .foregroundStyle(Color.blue)
+                                    .foregroundStyle(Color.purple)
                                     .padding(.horizontal, 8)
                                     .opacity(0.5)
                                 ZStack(alignment: .trailing){
@@ -50,7 +52,7 @@ struct HomePage: View {
                                         .padding(.trailing, 10)
                                         .foregroundColor(colorScheme == .dark ? .white : .black)
                                         .searchable(text: $searchText)
-                                        .focused($nameIsFocused)
+                                        .focused($voiceIsFocused)
                                         .submitLabel(.search)
                                         .onTapGesture {
                                             viewRequest()
@@ -61,7 +63,7 @@ struct HomePage: View {
                                             .foregroundColor(.secondary)
                                             .onTapGesture {
                                                 searchText = ""
-                                                nameIsFocused = false
+                                                voiceIsFocused = false
                                             }
                                             .padding(.trailing, 17)
                                     }
@@ -72,15 +74,20 @@ struct HomePage: View {
                         
                         // Picker View
                         VStack{
-                            
-                            Picker("name", selection: $pickerSelect) {
-                                ForEach(searchResults, id: \.self) { name in
-                                    Text(name.title)
-                                }
+                            if(names.isEmpty){
+                                GradientLoader()
+                                    .padding(10)
                             }
-                            .pickerStyle(.wheel)
-                            .onChange(of: searchResults, perform: {searchResults in if (!searchResults.isEmpty) {pickerSelect = searchResults[0]}})
-                            .onChange(of: pickerSelect, perform: {_ in inferenceToken = ""; pollObj.maybe_public_bucket_wav_audio_path! = "" })
+                            else{
+                                Picker("name", selection: $pickerSelect) {
+                                    ForEach(searchResults, id: \.self) { name in
+                                        Text(name.title)
+                                    }
+                                }
+                                .pickerStyle(.wheel)
+                                .onChange(of: searchResults, perform: {searchResults in if (!searchResults.isEmpty) {pickerSelect = searchResults[0]}})
+                                .onChange(of: pickerSelect, perform: {_ in inferenceToken = ""; pollObj.maybe_public_bucket_wav_audio_path! = "" })
+                            }
                         }
                     }
                     else{
@@ -133,22 +140,30 @@ struct HomePage: View {
                             ZStack{
                                 Capsule().frame(maxHeight: 40)
                                     .padding()
-                                    .foregroundStyle(Color.blue)
+                                    .foregroundStyle(Color.purple)
                                     .opacity(0.5)
-                                TextField("Text to Speech", text: $tts)
-                                    .padding(.horizontal,30)
-                                    .foregroundColor(colorScheme == .dark ? .white : .black)
-                                    .searchable(text: $tts)
-                                    .onChange(of: tts, perform: {_ in inferenceToken = ""; pollObj.maybe_public_bucket_wav_audio_path! = "" })
-                                    .submitLabel(.send)
-                                    .onTapGesture {
-                                        viewRequest()
-                                    }
+                                ZStack(alignment: .trailing){
+                                    TextField("Text to Speech", text: $tts)
+                                        .padding(.horizontal,30)
+                                        .foregroundColor(colorScheme == .dark ? .white : .black)
+                                        .searchable(text: $tts)
+                                        .onChange(of: tts, perform: {_ in inferenceToken = ""; pollObj.maybe_public_bucket_wav_audio_path! = "" })
+                                        .submitLabel(.send)
+                                        .onTapGesture {
+                                            viewRequest()
+                                        }
+                                        .focused($ttsIsFocused)
+                                    
+                                        Image(systemName: "xmark.circle.fill")
+                                            .foregroundColor(.secondary)
+                                            .onTapGesture {
+                                                tts = ""
+                                                ttsIsFocused = false
+                                                showTextInput.toggle()
+                                            }
+                                            .padding(.trailing, 25)
+                                }
                             }
-                            Button("Cancel"){
-                                tts = ""
-                                showTextInput.toggle()
-                            }.padding(.trailing, 30)
                         }
                         else if(showRecordAnim){
                             
@@ -214,7 +229,7 @@ struct HomePage: View {
                             Spacer()
                             
                             Image(systemName: "keyboard.fill")
-                                .foregroundColor(.blue)
+                                .foregroundColor(.purple)
                                 .font(.system(size: 45))
                                 .padding(.horizontal, 40)
                                 .onTapGesture {
@@ -224,7 +239,7 @@ struct HomePage: View {
                             Spacer()
                             
                             Image(systemName: "mic.square.fill")
-                                .foregroundColor(.blue)
+                                .foregroundColor(.purple)
                                 .font(.system(size: 40))
                                 .padding(.horizontal, 40)
                                 .onTapGesture{
@@ -260,6 +275,11 @@ struct HomePage: View {
                             .font(.system(size:60))
                     }
                     .disabled(tts.isEmpty || QueueComponent(voiceObj: voiceObj).queue >= 200 || names.isEmpty)
+                    .foregroundStyle(
+                        tts.isEmpty || QueueComponent(voiceObj: voiceObj).queue >= 200 || names.isEmpty ?
+                        Color(red:104/255, green: 104/255, blue: 104/255, opacity: 0.8):
+                            Color.purple
+                    )
                 }
                 else if(voiceObj.isDisabled){
                     if(QueueComponent(voiceObj: voiceObj).queue >= 120 && QueueComponent(voiceObj: voiceObj).queue < 200){
@@ -287,7 +307,7 @@ struct HomePage: View {
                                 Text("New Request")
                             }
                         }
-                        .buttonStyle(.borderedProminent)
+                        .foregroundStyle(Color.purple)
                         .padding(10)
                         
                         Spacer()
@@ -300,7 +320,7 @@ struct HomePage: View {
                                 Text("Share")
                             }
                         }
-                        .buttonStyle(.borderedProminent)
+                        .foregroundStyle(Color.purple)
                         .padding(10)
                         
                         Spacer()
@@ -318,9 +338,11 @@ struct HomePage: View {
                     }
                 }
             }
+//            .foregroundStyle(Color(red:29/255, green: 29/255, blue: 31/255))
         }
         else{
             NoNetworkView()
+//                .foregroundStyle(Color(red:29/255, green: 29/255, blue: 31/255))
         }
     }
     
