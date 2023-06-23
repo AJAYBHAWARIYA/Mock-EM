@@ -137,7 +137,7 @@ struct PlayBack: View {
                         let totatTime = (player.currentItem?.duration.seconds)!
                         
                         if(totatTime.isNaN || player.currentTime().seconds.isNaN){
-                            Text("00:00/0:00").padding(10)
+                            Text("00:00/00:00").padding(10)
                         }
                         else if (player.currentTime().seconds < 0){
                             Text("00:00/\(MMSSTimeFormattor(seconds: totatTime))").padding(10)
