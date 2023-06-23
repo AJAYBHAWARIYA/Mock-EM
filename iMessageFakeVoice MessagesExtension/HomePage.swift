@@ -5,7 +5,8 @@ import Messages
 struct HomePage: View {
     
     var requestPresentationStyle : (MSMessagesAppPresentationStyle) -> Void
-    var submitMessage: (String) -> Void
+    var submitMessage: (String, String, String) -> Void
+    var presentationStyle: MSMessagesAppPresentationStyle
     
     @StateObject private var voiceObj = voiceClass()
 //    @StateObject private var API = FrontendAPIEndpoint(voiceObj: voiceClass(), inferenceToken: &self.s, pollObj: &pollParams())
@@ -20,6 +21,7 @@ struct HomePage: View {
     @State var showTextInput : Bool = false
     @State var showRecordAnim : Bool = false
     @State private var isRecording : Bool = false
+    @State private var pageState : PageViewState = .home
     
     @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
@@ -36,7 +38,7 @@ struct HomePage: View {
         
         if networkMonitor.isConnected{
             VStack{
-                if(inferenceToken == ""){
+                if(pageState == .home){
                     
                     if(!(showTextInput || showRecordAnim)){
                         HStack{
@@ -265,14 +267,7 @@ struct HomePage: View {
                     Spacer()
                     
                     Button{
-                        Task{
-                            do{
-                                inferenceToken = try await voiceObj.ttsRequest(tts_model: pickerSelect.model_token, textToConvert: tts, uuid: UUID().uuidString)!
-                                pollObj = try await voiceObj.pollRequest(inference_job_token: inferenceToken)!
-                            } catch {
-                                print("500 Internal Server Error")
-                            }
-                        }
+                        pageState = .progress
                     } label: {
                         Image(systemName: "arrow.up.circle.fill")
                             .font(.system(size:60))
@@ -285,7 +280,7 @@ struct HomePage: View {
                             Color.purple
                     )
                 }
-                else if(voiceObj.isDisabled){
+                else if(pageState == .progress){
                     if(QueueComponent(voiceObj: voiceObj).queue >= 120 && QueueComponent(voiceObj: voiceObj).queue < 200){
                         Text("Server is Loaded. Might take a while to serve your request")
                             .font(.title2)
@@ -293,9 +288,25 @@ struct HomePage: View {
                             .padding(.bottom, 10)
                     }
                     ProgressAnim()
+                        .onAppear{
+                            Task{
+                                do{
+                                    inferenceToken = try await voiceObj.ttsRequest(tts_model: pickerSelect.model_token, textToConvert: tts, uuid: UUID().uuidString)!
+                                    pollObj = try await voiceObj.pollRequest(inference_job_token: inferenceToken)!
+                                    pageState = .playback
+                                } catch {
+                                    print("500 Internal Server Error")
+                                }
+                            }
+                        }
                 }
-                else {
-                    PlayBack(link: "https://storage.googleapis.com/vocodes-public" + (pollObj.maybe_public_bucket_wav_audio_path!))
+                else if(pageState == .playback){
+                    PlayBack(
+                        link: "https://storage.googleapis.com/vocodes-public" + (pollObj.maybe_public_bucket_wav_audio_path!),
+                        presentationStyle: presentationStyle,
+                        voice: pickerSelect.title,
+                        tts: tts
+                    )
                     
                     HStack{
                         Spacer()
@@ -304,6 +315,7 @@ struct HomePage: View {
                             inferenceToken = ""
                             tts = ""
                             pollObj = pollParams()
+                            pageState = .home
                             showTextInput.toggle()
                         } label: {
                             HStack{
@@ -317,7 +329,7 @@ struct HomePage: View {
                         Spacer()
                         
                         Button{
-                            submitMessage("https://storage.googleapis.com/vocodes-public" + (pollObj.maybe_public_bucket_wav_audio_path!))
+                            submitMessage("https://storage.googleapis.com/vocodes-public" + (pollObj.maybe_public_bucket_wav_audio_path!), pickerSelect.title, tts)
                             requestPresentationStyle(.compact)
                         } label: {
                             HStack{
@@ -358,4 +370,8 @@ struct HomePage: View {
             return names.filter { name in name.title.contains(searchText) }
         }
     }
+}
+
+enum PageViewState {
+    case home, progress, playback
 }

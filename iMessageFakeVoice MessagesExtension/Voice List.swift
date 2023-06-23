@@ -45,7 +45,6 @@ class voiceClass : ObservableObject{
     private let pollBaseUrl = "https://api.fakeyou.com/tts/job/"
     private let queueUrl = URL(string: "https://api.fakeyou.com/tts/queue_length")!
     private let WAIT_COUNT = 30
-    @Published var isDisabled : Bool = false
     
     private func getRatings(_ voice: voice) -> Double{
         if (voice.user_ratings.total_count == 0){
@@ -66,6 +65,14 @@ class voiceClass : ObservableObject{
     func getVoices() async throws -> [voice]? {
         let (data, _) = try await URLSession.shared.data(from: listUrl)
         let decodedResponse = try? JSONDecoder().decode(voices.self, from: data)
+//        var count = 0
+//        while (decodedResponse?.models) == nil {
+//            try await Task.sleep(nanoseconds: 2_000_000_000)
+//            (data, _) = try await URLSession.shared.data(from: listUrl)
+//            decodedResponse = try? JSONDecoder().decode(voices.self, from: data)
+//            print("inference: ", count)
+//            count += 1
+//        }
         var filteredVoices = (decodedResponse?.models.filter { voice in getRatings(voice) >= 3.0 })!
         filteredVoices.sort{(s1, s2) in getRatings(s1) > getRatings(s2)}
         print(filteredVoices.count)
@@ -79,7 +86,6 @@ class voiceClass : ObservableObject{
     }
     
     func ttsRequest(tts_model: String, textToConvert: String, uuid: String) async throws -> String?{
-        isDisabled = true
         let params = ["tts_model_token": tts_model, "inference_text": textToConvert, "uuid_idempotency_token": uuid]
         
         print("tts: ", textToConvert)
@@ -93,13 +99,18 @@ class voiceClass : ObservableObject{
         request.setValue("Basic SAPI:AK_C04F7EF9060205", forHTTPHeaderField: "Authorization")
         request.httpMethod = "POST"
         
-        var (data, _) = try await URLSession.shared.upload(for: request, from: encoded)
-        var decodedResponse = try? JSONDecoder().decode(generateTtsAudio.self, from: data)
-        /* TODO (inference decoding nil)*/
-//        while (decodedResponse?.inference_job_token)! == nil {
+        let (data, _) = try await URLSession.shared.upload(for: request, from: encoded)
+        let decodedResponse = try? JSONDecoder().decode(generateTtsAudio.self, from: data)
+        // TODO: (inference decoding nil)
+//        var count = 0
+//        while ((decodedResponse?.inference_job_token) == nil && count == 1){
+//            try await Task.sleep(nanoseconds: 2_000_000_000)
 //            (data, _) = try await URLSession.shared.upload(for: request, from: encoded)
 //            decodedResponse = try? JSONDecoder().decode(generateTtsAudio.self, from: data)
+//            print("inference: ", count)
+//            count += 1
 //        }
+//        return "JTINF:an0mwvjabc0ebe6xf7n5hqaab8"
         return decodedResponse?.inference_job_token
     }
     
@@ -129,7 +140,6 @@ class voiceClass : ObservableObject{
 //                break;
 //            }
         }
-        isDisabled = false
         return decodedResponse?.state
     }
 }

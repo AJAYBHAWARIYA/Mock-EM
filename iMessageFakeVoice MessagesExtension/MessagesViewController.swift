@@ -15,18 +15,28 @@ class MessagesViewController: MSMessagesAppViewController {
         super.viewDidLoad()
     }
     
+    override func contentSizeThatFits(_ size: CGSize) -> CGSize {
+        if presentationStyle == .transcript{
+            return CGSize(width: 550, height: 200)
+        }
+        return size
+    }
+    
     // MARK: - Conversation Handling
-    func composeSelectionMsg(in session: MSSession, link: String) -> MSMessage {
+    func composeSelectionMsg(in session: MSSession, link: String, voice: String, tts: String) -> MSMessage {
         
         var components = URLComponents()
         var queryItems = [URLQueryItem]()
         queryItems.append(URLQueryItem(name: "link", value: link))
+        queryItems.append(URLQueryItem(name: "voice", value: voice))
+        queryItems.append(URLQueryItem(name: "tts", value: tts))
         
         let layout = MSMessageTemplateLayout()
         //        layout.caption = "Johnny Test"
         
         let layout1 = MSMessageLiveLayout(alternateLayout: layout)
-        //        layout1.alternateLayout.caption = "Mayank"
+        layout1.alternateLayout.caption = "Voice: "+voice
+        layout1.alternateLayout.subcaption = "Transcript: " + tts
         
         let message = MSMessage(session: session)
         message.layout = layout1
@@ -38,7 +48,7 @@ class MessagesViewController: MSMessagesAppViewController {
         return message
     }
     
-    func submitMessage(link: String) {
+    func submitMessage(link: String, voice: String, tts: String) {
         guard let conversation = activeConversation else {
             os_log("submitMessage(): guard on conversation falied!", log: .default, type: .debug)
             return
@@ -53,7 +63,7 @@ class MessagesViewController: MSMessagesAppViewController {
         }
         var message: MSMessage
         
-        message = composeSelectionMsg(in: session, link: link)
+        message = composeSelectionMsg(in: session, link: link, voice: voice, tts: tts)
         
         conversation.insert(message) { error in
             if let error = error {
@@ -101,7 +111,7 @@ class MessagesViewController: MSMessagesAppViewController {
 
 struct ContentView: View {
     var requestPresentationStyle: (MSMessagesAppPresentationStyle) -> Void
-    var submitMessage: ((String) -> Void)?
+    var submitMessage: ((String, String, String) -> Void)?
     var selectedMessage: MSMessage?
     var presentationStyle: MSMessagesAppPresentationStyle
     @StateObject var networkMonitor = NetworkMonitor()
@@ -110,12 +120,17 @@ struct ContentView: View {
         if(presentationStyle == .compact){
             HomePage(
                 requestPresentationStyle: requestPresentationStyle,
-                submitMessage: submitMessage!
+                submitMessage: submitMessage!,
+                presentationStyle: presentationStyle
             )
             .environmentObject(networkMonitor)
         }
         else{
-            PlayBack(message: selectedMessage)
+            PlayBack(
+                message: selectedMessage,
+                presentationStyle: presentationStyle
+            )
+            .environmentObject(networkMonitor)
         }
     }
 }

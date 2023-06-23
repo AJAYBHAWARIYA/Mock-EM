@@ -6,20 +6,36 @@ import Messages
 struct PlayBack: View {
 
     var link : String
+    var presentationStyle: MSMessagesAppPresentationStyle
+    var voice: String
+    var tts: String
+    
+    private let timer = Timer.publish(every: 0.01, on: .main, in: .common).autoconnect()
+    
     @State private var player = AVPlayer()
     @State private var currentTime : Double = 0.0
     @State private var isPlaying = false
-    private let timer = Timer.publish(every: 0.01, on: .main, in: .common).autoconnect()
     
-    init?(message: MSMessage?) {
+    @EnvironmentObject var networkMonitor: NetworkMonitor
+    
+    
+    init?(message: MSMessage?, presentationStyle: MSMessagesAppPresentationStyle) {
         guard let messageURL = message?.url else { return nil }
         guard let urlComponents = NSURLComponents(url: messageURL, resolvingAgainstBaseURL: false) else { return nil }
         guard let queryItems = urlComponents.queryItems else { return nil }
-        self.init(link: (queryItems.first?.value)!)
+        self.init(
+            link: (queryItems[0].value)!,
+            presentationStyle: presentationStyle,
+            voice: (queryItems[1].value)!,
+            tts: (queryItems[2].value)!
+        )
     }
     
-    init(link: String){
+    init(link: String, presentationStyle: MSMessagesAppPresentationStyle, voice: String, tts: String){
         self.link = link
+        self.presentationStyle = presentationStyle
+        self.voice = voice
+        self.tts = tts
     }
     
     private func playPause() {
@@ -64,72 +80,101 @@ struct PlayBack: View {
     }
 
     var body: some View {
-        
-        HStack{
-            
-            Button{
-                if (
-                    player.currentItem?.duration.seconds == nil ||
-                    player.currentTime().seconds >= ((player.currentItem?.duration.seconds)!)
-                ){
-                    player = AVPlayer(url: URL(string: link)!)
-                    player.play()
-                    isPlaying = true
-                }
-                else{
-                    self.playPause()
-                }
-            }label: {
-                if(isPlaying){
-                    Image(systemName: "pause.fill").font(.system(size: 40))
-                        .foregroundStyle(Color.purple)
-                }
-                else{
-                    Image(systemName: "play.fill").font(.system(size: 40))
-                        .foregroundStyle(Color.purple)
-                }
-            }
-            .onReceive(timer, perform: { _ in
-                
-                if(player.currentItem?.duration.seconds != nil){
-                    if (player.currentTime().seconds < 0){
-                        currentTime = 0.0
+        if networkMonitor.isConnected{
+            VStack{
+                HStack{
+                    
+                    Button{
+                        if (
+                            player.currentItem?.duration.seconds == nil ||
+                            player.currentTime().seconds >= ((player.currentItem?.duration.seconds)!)
+                        ){
+                            player = AVPlayer(url: URL(string: link)!)
+                            player.play()
+                            isPlaying = true
+                        }
+                        else{
+                            self.playPause()
+                        }
+                    }label: {
+                        if(isPlaying){
+                            Image(systemName: "pause.fill").font(.system(size: 40))
+                                .foregroundStyle(Color.purple)
+                        }
+                        else{
+                            Image(systemName: "play.fill").font(.system(size: 40))
+                                .foregroundStyle(Color.purple)
+                        }
                     }
+                    .onReceive(timer, perform: { _ in
+                        
+                        if(player.currentItem?.duration.seconds != nil){
+                            if (player.currentTime().seconds < 0){
+                                currentTime = 0.0
+                            }
+                            else{
+                                currentTime = player.currentTime().seconds/((player.currentItem?.duration.seconds)!)
+                            }
+                        }
+                        
+                        if(
+                            player.currentItem?.duration.seconds != nil &&
+                            player.currentTime().seconds >= ((player.currentItem?.duration.seconds)!)
+                        ){
+                            isPlaying = false
+                        }
+                    })
+                    .padding(10)
+                    
+                    ProgressView(value: currentTime).progressViewStyle(.linear).frame(maxWidth: 300).padding(10)
+                    
+                    if(player.currentItem?.duration.seconds == nil){
+                        Text("00:00/00:00")
+                    }
+                    
                     else{
-                        currentTime = player.currentTime().seconds/((player.currentItem?.duration.seconds)!)
+                        
+                        let totatTime = (player.currentItem?.duration.seconds)!
+                        
+                        if(totatTime.isNaN || player.currentTime().seconds.isNaN){
+                            Text("00:00/0:00").padding(10)
+                        }
+                        else if (player.currentTime().seconds < 0){
+                            Text("00:00/\(MMSSTimeFormattor(seconds: totatTime))").padding(10)
+                        }
+                        else{
+                            Text(
+                                "\(MMSSTimeFormattor(seconds: currentTime*totatTime))/\(MMSSTimeFormattor(seconds: totatTime))"
+                            ).padding(10)
+                        }
                     }
                 }
-                
-                if(
-                    player.currentItem?.duration.seconds != nil &&
-                    player.currentTime().seconds >= ((player.currentItem?.duration.seconds)!)
-                ){
-                    isPlaying = false
+                if(presentationStyle == .transcript){
+                    HStack{
+                        Text("Voice:").fontWeight(.bold)
+                        Text(voice)
+                    }
+                    .frame(maxWidth: 540, maxHeight: 30)
+                    
+                    HStack(alignment: .firstTextBaseline) {
+                        Text("Transcript:").fontWeight(.bold)
+                        Text(tts)
+                    }
+                    .frame(maxWidth: 540, maxHeight: 50, alignment: .leading)
                 }
-            })
-            .padding(10)
-            
-            ProgressView(value: currentTime).progressViewStyle(.linear).frame(maxWidth: 300).padding(10)
-            
-            if(player.currentItem?.duration.seconds == nil){
-                Text("00:00/00:00")
             }
-            
-            else{
+        }
+        else{
+            HStack{
+                Image(systemName: "wifi.slash")
+                    .foregroundStyle(Color.red)
+                    .padding(10)
+                    .font(.title)
                 
-                let totatTime = (player.currentItem?.duration.seconds)!
-                
-                if(totatTime.isNaN || player.currentTime().seconds.isNaN){
-                    Text("00:00/0:00").padding(10)
-                }
-                else if (player.currentTime().seconds < 0){
-                    Text("00:00/\(MMSSTimeFormattor(seconds: totatTime))").padding(10)
-                }
-                else{
-                    Text(
-                        "\(MMSSTimeFormattor(seconds: currentTime*totatTime))/\(MMSSTimeFormattor(seconds: totatTime))"
-                    ).padding(10)
-                }
+                Text("Network connection seems to be offline.\nPlease check your connectivity.")
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(Color(white: 0.4745))
+                    .font(.title3)
             }
         }
     }
