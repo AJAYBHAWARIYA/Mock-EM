@@ -1,9 +1,11 @@
 import SwiftUI
 import AVFoundation
+import Messages
 
 struct HomePage: View {
     
-    var viewRequest : () -> Void
+    var requestPresentationStyle : (MSMessagesAppPresentationStyle) -> Void
+    var submitMessage: (String) -> Void
     
     @StateObject private var voiceObj = voiceClass()
 //    @StateObject private var API = FrontendAPIEndpoint(voiceObj: voiceClass(), inferenceToken: &self.s, pollObj: &pollParams())
@@ -55,7 +57,7 @@ struct HomePage: View {
                                         .focused($voiceIsFocused)
                                         .submitLabel(.search)
                                         .onTapGesture {
-                                            viewRequest()
+                                            requestPresentationStyle(.expanded)
                                         }
                                     
                                     if !searchText.isEmpty{
@@ -150,7 +152,7 @@ struct HomePage: View {
                                         .onChange(of: tts, perform: {_ in inferenceToken = ""; pollObj.maybe_public_bucket_wav_audio_path! = "" })
                                         .submitLabel(.send)
                                         .onTapGesture {
-                                            viewRequest()
+                                            requestPresentationStyle(.expanded)
                                         }
                                         .focused($ttsIsFocused)
                                     
@@ -252,6 +254,7 @@ struct HomePage: View {
                     
                     Spacer()
                     
+                    //TODO: Check the QueueComponent object, as its not printing the text on screen
                     if(QueueComponent(voiceObj: voiceObj).queue >= 200){
                         Text("Server is Loaded. Cannot process the request at the moment")
                             .font(.title2)
@@ -274,6 +277,7 @@ struct HomePage: View {
                         Image(systemName: "arrow.up.circle.fill")
                             .font(.system(size:60))
                     }
+                    //TODO: Check the QueueComponent object, as its not disabling the button and foregroundStyle on screen
                     .disabled(tts.isEmpty || QueueComponent(voiceObj: voiceObj).queue >= 200 || names.isEmpty)
                     .foregroundStyle(
                         tts.isEmpty || QueueComponent(voiceObj: voiceObj).queue >= 200 || names.isEmpty ?
@@ -313,7 +317,8 @@ struct HomePage: View {
                         Spacer()
                         
                         Button{
-                            let link = URL(string: "https://storage.googleapis.com/vocodes-public" + (pollObj.maybe_public_bucket_wav_audio_path!))!
+                            submitMessage("https://storage.googleapis.com/vocodes-public" + (pollObj.maybe_public_bucket_wav_audio_path!))
+                            requestPresentationStyle(.compact)
                         } label: {
                             HStack{
                                 Image(systemName: "square.and.arrow.up")

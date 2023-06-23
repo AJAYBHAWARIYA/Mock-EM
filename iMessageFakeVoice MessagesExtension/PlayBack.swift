@@ -1,13 +1,26 @@
 import SwiftUI
 import AVFoundation
+import Messages
 
 
 struct PlayBack: View {
+
     var link : String
     @State private var player = AVPlayer()
     @State private var currentTime : Double = 0.0
     @State private var isPlaying = false
     private let timer = Timer.publish(every: 0.01, on: .main, in: .common).autoconnect()
+    
+    init?(message: MSMessage?) {
+        guard let messageURL = message?.url else { return nil }
+        guard let urlComponents = NSURLComponents(url: messageURL, resolvingAgainstBaseURL: false) else { return nil }
+        guard let queryItems = urlComponents.queryItems else { return nil }
+        self.init(link: (queryItems.first?.value)!)
+    }
+    
+    init(link: String){
+        self.link = link
+    }
     
     private func playPause() {
         if isPlaying {
@@ -99,7 +112,7 @@ struct PlayBack: View {
             ProgressView(value: currentTime).progressViewStyle(.linear).frame(maxWidth: 300).padding(10)
             
             if(player.currentItem?.duration.seconds == nil){
-                Text("00:00/0:00")
+                Text("00:00/00:00")
             }
             
             else{

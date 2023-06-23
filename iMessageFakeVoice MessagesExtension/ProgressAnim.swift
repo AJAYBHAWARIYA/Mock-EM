@@ -105,7 +105,6 @@ struct GradientLoader : View{
     
     var body: some View{
         Rectangle()
-//            .frame(width: 400, height: 100, alignment: .center)
             .cornerRadius(10)
             .foregroundStyle(
                 LinearGradient(

@@ -36,9 +36,7 @@ struct QueueComponent: View{
                         getQueue()
                     })
                     .foregroundStyle(
-                        queue <= 60 ? Color.white :
-                            queue <= 120 ? Color.black :
-                            Color.white
+                        Color.white
                     )
                     .font(.system(size: 17, weight: .bold))
                     .padding(.horizontal,5)
