@@ -130,7 +130,6 @@ struct PlayBack: View {
                         "\(MMSSTimeFormattor(seconds: currentTime*totatTime))/\(MMSSTimeFormattor(seconds: totatTime))"
                     ).padding(10)
                 }
-                
             }
         }
     }
