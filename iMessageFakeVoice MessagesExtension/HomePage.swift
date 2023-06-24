@@ -266,20 +266,41 @@ struct HomePage: View {
                     }
                     
                     Spacer()
-                    
-                    Button{
-                        pageState = .progress
-                    } label: {
-                        Image(systemName: "arrow.up.circle.fill")
-                            .font(.system(size:60))
+
+                    HStack{
+                        Spacer()
+                        
+                        Button{
+                            pageState = .progress
+                        } label: {
+                            Image(systemName: "arrow.up.circle.fill")
+                                .font(.system(size:60))
+                        }
+                        //TODO: Check the QueueComponent object, as its not disabling the button and foregroundStyle on screen
+                        .disabled(tts.isEmpty || QueueComponent(voiceObj: voiceObj).queue >= 200 || names.isEmpty)
+                        .foregroundStyle(
+                            tts.isEmpty || QueueComponent(voiceObj: voiceObj).queue >= 200 || names.isEmpty ?
+                            Color(red:104/255, green: 104/255, blue: 104/255, opacity: 0.8):
+                                Color.purple
+                        )
+                        
+                        Spacer()
                     }
-                    //TODO: Check the QueueComponent object, as its not disabling the button and foregroundStyle on screen
-                    .disabled(tts.isEmpty || QueueComponent(voiceObj: voiceObj).queue >= 200 || names.isEmpty)
-                    .foregroundStyle(
-                        tts.isEmpty || QueueComponent(voiceObj: voiceObj).queue >= 200 || names.isEmpty ?
-                        Color(red:104/255, green: 104/255, blue: 104/255, opacity: 0.8):
-                            Color.purple
-                    )
+                    .overlay(alignment: .bottomTrailing){
+                        HStack{
+                            Image(systemName: "info.circle.fill")
+                                .font(.title3)
+                            Text("Credits")
+                        }
+                        .foregroundStyle(Color(white: 0.7))
+                        .offset(x: 0, y: 15)
+                        .padding(.trailing, 10)
+                        .onTapGesture{
+                            withAnimation(.easeIn){
+                                pageState = .credits
+                            }
+                        }
+                    }
                 }
                 else if(pageState == .progress){
                     if(QueueComponent(voiceObj: voiceObj).queue >= 120 && QueueComponent(voiceObj: voiceObj).queue < 200){
@@ -344,6 +365,13 @@ struct HomePage: View {
                         Spacer()
                     }
                 }
+                else if(pageState == .credits){
+                    CreditsView(goBack: {
+                        withAnimation(.easeOut){
+                            pageState = .home
+                        }
+                    }, iosPotrait: iosPotrait)
+                }
             }
             .onAppear {
                 Task{
@@ -374,5 +402,5 @@ struct HomePage: View {
 }
 
 enum PageViewState {
-    case home, progress, playback
+    case home, progress, playback, credits
 }

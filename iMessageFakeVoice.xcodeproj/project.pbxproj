@@ -21,6 +21,7 @@
 		E14F059B2A2D7A5500F57AAB /* Voice List.swift in Sources */ = {isa = PBXBuildFile; fileRef = E14F059A2A2D7A5500F57AAB /* Voice List.swift */; };
 		E1D880F72A3013010074C33F /* ProgressAnim.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1D880F62A3013010074C33F /* ProgressAnim.swift */; };
 		E1E6FB1E2A354D15002C1FAF /* PlayBack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E6FB1D2A354D15002C1FAF /* PlayBack.swift */; };
+		E1F6BE2D2A4783AE00D04C91 /* CreditsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1F6BE2C2A4783AE00D04C91 /* CreditsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,6 +66,7 @@
 		E14F059A2A2D7A5500F57AAB /* Voice List.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Voice List.swift"; sourceTree = "<group>"; };
 		E1D880F62A3013010074C33F /* ProgressAnim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressAnim.swift; sourceTree = "<group>"; };
 		E1E6FB1D2A354D15002C1FAF /* PlayBack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayBack.swift; sourceTree = "<group>"; };
+		E1F6BE2C2A4783AE00D04C91 /* CreditsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -128,6 +130,7 @@
 				E11DDFF02A3E94410027D499 /* NoNetworkView.swift */,
 				E11DDFEE2A3D555F0027D499 /* QueueComponent.swift */,
 				E14F058A2A2D796A00F57AAB /* Assets.xcassets */,
+				E1F6BE2C2A4783AE00D04C91 /* CreditsView.swift */,
 				E14F058C2A2D796A00F57AAB /* Info.plist */,
 				E1D880F62A3013010074C33F /* ProgressAnim.swift */,
 			);
@@ -236,6 +239,7 @@
 				E11DDFF32A3EAA2C0027D499 /* FrontendAPIEndpoint.swift in Sources */,
 				E11DDFF12A3E94410027D499 /* NoNetworkView.swift in Sources */,
 				E1D880F72A3013010074C33F /* ProgressAnim.swift in Sources */,
+				E1F6BE2D2A4783AE00D04C91 /* CreditsView.swift in Sources */,
 				E14F05862A2D796900F57AAB /* MessagesViewController.swift in Sources */,
 				E1E6FB1E2A354D15002C1FAF /* PlayBack.swift in Sources */,
 				E14F059B2A2D7A5500F57AAB /* Voice List.swift in Sources */,
