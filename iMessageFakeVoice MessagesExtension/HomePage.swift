@@ -86,6 +86,7 @@ struct HomePage: View {
                                 Picker("name", selection: $pickerSelect) {
                                     ForEach(searchResults, id: \.self) { name in
                                         Text(name.title)
+                                            .font(.system(.title2, design: .rounded))
                                     }
                                 }
                                 .pickerStyle(.wheel)
@@ -104,10 +105,10 @@ struct HomePage: View {
                                 VStack{
                                     Text("Voice Selected:" )
                                         .fontWeight(.bold)
-                                        .font(.title2)
+                                        .font(.system(.title2, design: .rounded))
                                     
                                     Text("\(pickerSelect.title)")
-                                        .font(.title3)
+                                        .font(.system(.title3, design: .rounded))
                                         .opacity(0.8)
                                         .frame(maxHeight: 20)
                                         .padding(.vertical, 10)
@@ -123,9 +124,9 @@ struct HomePage: View {
                                 HStack{
                                     Text("Voice Selected:" )
                                         .fontWeight(.bold)
-                                        .font(.title2)
+                                        .font(.system(.title2, design: .rounded))
                                     Text("\(pickerSelect.title)")
-                                        .font(.title3)
+                                        .font(.system(.title3, design: .rounded))
                                         .opacity(0.8)
                                 }
                                 .frame(maxHeight: 30)
@@ -218,7 +219,7 @@ struct HomePage: View {
                                 
                                 Text("TRANSCRIPT")
                                     .fontWeight(.bold)
-                                    .font(.title2)
+                                    .font(.system(.title2, design: .rounded))
                                     .padding(.bottom,2)
                                 
                                 ScrollView{
@@ -259,7 +260,7 @@ struct HomePage: View {
                     //TODO: Check the QueueComponent object, as its not printing the text on screen
                     if(QueueComponent(voiceObj: voiceObj).queue >= 200){
                         Text("Server is Loaded. Cannot process the request at the moment")
-                            .font(.title2)
+                            .font(.system(.title2, design: .rounded))
                             .foregroundStyle(Color.red)
                             .multilineTextAlignment(.center)
                     }
@@ -283,7 +284,7 @@ struct HomePage: View {
                 else if(pageState == .progress){
                     if(QueueComponent(voiceObj: voiceObj).queue >= 120 && QueueComponent(voiceObj: voiceObj).queue < 200){
                         Text("Server is Loaded. Might take a while to serve your request")
-                            .font(.title2)
+                            .font(.system(.title2, design: .rounded))
                             .foregroundStyle(Color.red)
                             .padding(.bottom, 10)
                     }

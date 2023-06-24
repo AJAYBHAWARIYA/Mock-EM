@@ -124,6 +124,7 @@ struct ContentView: View {
                 presentationStyle: presentationStyle
             )
             .environmentObject(networkMonitor)
+            .font(.system(.body, design: .rounded))
         }
         else{
             PlayBack(
@@ -131,6 +132,7 @@ struct ContentView: View {
                 presentationStyle: presentationStyle
             )
             .environmentObject(networkMonitor)
+            .font(.system(.body, design: .rounded))
         }
     }
 }

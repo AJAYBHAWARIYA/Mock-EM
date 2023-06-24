@@ -37,7 +37,7 @@ struct NoNetworkView: View {
             Text("Network connection\nseems to be offline.\nPlease check your\nconnectivity.")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color(white: 0.4745))
-                .font(.title2)
+                .font(.system(.title2, design: .rounded))
         }
     }
 }

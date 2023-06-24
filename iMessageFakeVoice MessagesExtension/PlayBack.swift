@@ -174,7 +174,7 @@ struct PlayBack: View {
                 Text("Network connection seems to be offline.\nPlease check your connectivity.")
                     .multilineTextAlignment(.center)
                     .foregroundStyle(Color(white: 0.4745))
-                    .font(.title3)
+                    .font(.system(.title3, design: .rounded))
             }
         }
     }

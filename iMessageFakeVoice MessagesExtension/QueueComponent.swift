@@ -38,7 +38,7 @@ struct QueueComponent: View{
                     .foregroundStyle(
                         Color.white
                     )
-                    .font(.system(size: 17, weight: .bold))
+                    .font(.system(size: 17, weight: .bold, design: .rounded))
                     .padding(.horizontal,5)
             }
             .padding([.top, .leading], 10)
