@@ -150,6 +150,7 @@ struct HomePage: View {
                                 ZStack(alignment: .trailing){
                                     TextField("Text to Speech", text: $tts)
                                         .padding(.horizontal,30)
+                                        .padding(.trailing, 15)
                                         .foregroundColor(colorScheme == .dark ? .white : .black)
                                         .searchable(text: $tts)
                                         .onChange(of: tts, perform: {_ in inferenceToken = ""; pollObj.maybe_public_bucket_wav_audio_path! = "" })
@@ -161,12 +162,13 @@ struct HomePage: View {
                                     
                                         Image(systemName: "xmark.circle.fill")
                                             .foregroundColor(.secondary)
+                                            .font(.title2)
                                             .onTapGesture {
                                                 tts = ""
                                                 ttsIsFocused = false
                                                 showTextInput.toggle()
                                             }
-                                            .padding(.trailing, 25)
+                                            .padding(.trailing, 20)
                                 }
                             }
                         }
