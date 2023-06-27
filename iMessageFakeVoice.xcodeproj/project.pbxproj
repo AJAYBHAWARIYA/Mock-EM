@@ -53,6 +53,7 @@
 		E11DDFEE2A3D555F0027D499 /* QueueComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueComponent.swift; sourceTree = "<group>"; };
 		E11DDFF02A3E94410027D499 /* NoNetworkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoNetworkView.swift; sourceTree = "<group>"; };
 		E11DDFF22A3EAA2C0027D499 /* FrontendAPIEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrontendAPIEndpoint.swift; sourceTree = "<group>"; };
+		E12D30B82A4903A400491FE9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		E14F05742A2D796800F57AAB /* iMessageFakeVoice.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iMessageFakeVoice.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E14F05772A2D796900F57AAB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E14F057D2A2D796900F57AAB /* iMessageFakeVoice MessagesExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "iMessageFakeVoice MessagesExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -103,6 +104,7 @@
 		E14F05762A2D796800F57AAB /* iMessageFakeVoice */ = {
 			isa = PBXGroup;
 			children = (
+				E12D30B82A4903A400491FE9 /* Info.plist */,
 				E14F05772A2D796900F57AAB /* Assets.xcassets */,
 				E11411362A465707001337B0 /* iMessageFakeVoice.entitlements */,
 			);
@@ -460,6 +462,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8KY6HSRYV6;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = iMessageFakeVoice/Info.plist;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "";
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -490,6 +493,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8KY6HSRYV6;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = iMessageFakeVoice/Info.plist;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "";
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;

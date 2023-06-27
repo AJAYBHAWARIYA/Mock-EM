@@ -12,7 +12,7 @@ struct PlayBack: View {
     
     private let timer = Timer.publish(every: 0.01, on: .main, in: .common).autoconnect()
     
-    @State private var player = AVPlayer()
+    @State var player : AVAudioPlayer?
     @State private var currentTime : Double = 0.0
     @State private var isPlaying = false
     
@@ -38,13 +38,36 @@ struct PlayBack: View {
         self.tts = tts
     }
     
-    private func playPause() {
-        if isPlaying {
-            player.pause()
-        } else {
-            player.play()
+    func retrieveAudio(){
+        let url = URL(string: link)!
+        URLSession.shared.dataTask(with: url){
+            (data, response, error) in
+            if let error = error{
+                print(error)
+            }
+            DispatchQueue.main.async {
+                do{
+                    player = try AVAudioPlayer(data: data!)
+                    player?.prepareToPlay()
+                }
+                catch{
+                    print("can't retrieve")
+                }
+            }
+        }.resume()
+    }
+    
+    func togglePlayPause(){
+        if let player = player{
+            if player.isPlaying{
+                player.pause()
+                isPlaying = false
+            }
+            else{
+                player.play()
+                isPlaying = true
+            }
         }
-        isPlaying.toggle()
     }
     
     private func MMSSTimeFormattor(seconds: Double) -> String {
@@ -83,63 +106,22 @@ struct PlayBack: View {
         if networkMonitor.isConnected{
             VStack{
                 HStack{
-                    
                     Button{
-                        if (
-                            player.currentItem?.duration.seconds == nil ||
-                            player.currentTime().seconds >= ((player.currentItem?.duration.seconds)!)
-                        ){
-                            player = AVPlayer(url: URL(string: link)!)
-                            player.play()
-                            isPlaying = true
-                        }
-                        else{
-                            self.playPause()
-                        }
-                    }label: {
-                        if(isPlaying){
-                            Image(systemName: "pause.fill").font(.system(size: 40))
-                                .foregroundStyle(Color.purple)
-                        }
-                        else{
-                            Image(systemName: "play.fill").font(.system(size: 40))
-                                .foregroundStyle(Color.purple)
-                        }
+                        togglePlayPause()
+                    } label: {
+                        Image(systemName: isPlaying ? "pause.fill" : "play.fill").font(.system(size: 40)).foregroundStyle(Color.purple)
                     }
-                    .onReceive(timer, perform: { _ in
-                        
-                        if(player.currentItem?.duration.seconds != nil){
-                            if (player.currentTime().seconds < 0){
-                                currentTime = 0.0
-                            }
-                            else{
-                                currentTime = player.currentTime().seconds/((player.currentItem?.duration.seconds)!)
-                            }
-                        }
-                        
-                        if(
-                            player.currentItem?.duration.seconds != nil &&
-                            player.currentTime().seconds >= ((player.currentItem?.duration.seconds)!)
-                        ){
-                            isPlaying = false
-                        }
-                    })
-                    .padding(10)
                     
                     ProgressView(value: currentTime).progressViewStyle(.linear).frame(maxWidth: 300).padding(10)
                     
-                    if(player.currentItem?.duration.seconds == nil){
-                        Text("00:00/00:00")
-                    }
-                    
-                    else{
+                    if let player = player {
                         
-                        let totatTime = (player.currentItem?.duration.seconds)!
+                        let totatTime = player.duration
                         
-                        if(totatTime.isNaN || player.currentTime().seconds.isNaN){
+                        if(totatTime.isNaN || player.currentTime.isNaN){
                             Text("00:00/00:00").padding(10)
                         }
-                        else if (player.currentTime().seconds < 0){
+                        else if (player.currentTime < 0){
                             Text("00:00/\(MMSSTimeFormattor(seconds: totatTime))").padding(10)
                         }
                         else{
@@ -154,15 +136,26 @@ struct PlayBack: View {
                         Text("Voice:").fontWeight(.bold)
                         Text(voice)
                     }
-                    .frame(maxWidth: 540, maxHeight: 30)
+                    .frame(maxWidth: 540, maxHeight: 30, alignment: .leading)
+                    .padding(.horizontal, 7)
                     
                     HStack(alignment: .firstTextBaseline) {
                         Text("Transcript:").fontWeight(.bold)
                         Text(tts)
                     }
                     .frame(maxWidth: 540, maxHeight: 50, alignment: .leading)
+                    .padding(.horizontal, 7)
                 }
             }
+            .onAppear{
+                retrieveAudio()
+            }
+            .onReceive(timer, perform: { _ in
+                if let player = player{
+                    currentTime = player.currentTime/player.duration
+                    isPlaying = player.isPlaying
+                }
+            })
         }
         else{
             HStack{
