@@ -1,23 +1,26 @@
 import SwiftUI
 import AVFoundation
 import Messages
-
+import Accelerate
 
 struct PlayBack: View {
+    
+    static private let tempPath = NSTemporaryDirectory()
+    static private let directoryName = "VoiceHistory"
 
     var link : String
     var presentationStyle: MSMessagesAppPresentationStyle
     var voice: String
     var tts: String
     
-    private let timer = Timer.publish(every: 0.01, on: .main, in: .common).autoconnect()
-    
-    @State var player : AVAudioPlayer?
+    @State private var linesCompleted = 0
+    @State private var timer = Timer.publish(every: .infinity, on: .main, in: .common).autoconnect()
+    @State private var player : AVAudioPlayer?
     @State private var currentTime : Double = 0.0
     @State private var isPlaying = false
+    @State private var spectogramData : [DataPoint] = []
     
     @EnvironmentObject var networkMonitor: NetworkMonitor
-    
     
     init?(message: MSMessage?, presentationStyle: MSMessagesAppPresentationStyle) {
         guard let messageURL = message?.url else { return nil }
@@ -39,31 +42,77 @@ struct PlayBack: View {
     }
     
     func retrieveAudio(){
-        let url = URL(string: link)!
-        URLSession.shared.dataTask(with: url){
-            (data, response, error) in
-            if let error = error{
-                print(error)
-            }
-            DispatchQueue.main.async {
+        let cacheURL : URL
+        var url : URL
+        do {
+            cacheURL = URL(fileURLWithPath: PlayBack.tempPath).appendingPathComponent(PlayBack.directoryName, conformingTo: .folder)
+            try FileManager.default.createDirectory(at: cacheURL, withIntermediateDirectories: true, attributes: nil)
+        } catch {
+            fatalError("Unable to create cache URL: \(error)")
+        }
+        
+        let fileName = voice + tts.lowercased()
+        
+        url = cacheURL.appendingPathComponent(fileName, conformingTo: .wav)
+        
+        if(!FileManager.default.fileExists(atPath: url.absoluteString)){
+            URLSession.shared.dataTask(with: URL(string: link)!) {
+                data, response, error in
+                
+                if let error = error {
+                    print("Error:", error)
+                }
+                let data = data!
+                do {
+                    try data.write(to: url, options: .atomic)
+                    print("Writing the data")
+                } catch {
+                    print("Can't write the audio data to the given URL")
+                    print(error)
+                }
+                player = {
+                    do{
+                        return try AVAudioPlayer(contentsOf: url)
+                    }
+                    catch{
+                        print("Can't retrieve new block")
+                        return AVAudioPlayer()
+                    }
+                }()
+                spectogramData = {
+                    let x = SpectrogramGenerator().getSpectogramData(url: url)
+                    var myPoints = [DataPoint]()
+                    for i in 0 ..< x.count {
+                        myPoints.append(DataPoint(magnitude: ((x[i]*(-1.0))*10.0).truncatingRemainder(dividingBy: 10.0)))
+                        
+                    }
+                    return myPoints
+                }()
+            }.resume()
+        }
+        else{
+            player = {
                 do{
-                    player = try AVAudioPlayer(data: data!)
-                    player?.prepareToPlay()
+                    return try AVAudioPlayer(contentsOf: url)
                 }
                 catch{
-                    print("can't retrieve")
+                    print("Can't retrieve completion block")
+                    return AVAudioPlayer()
                 }
-            }
-        }.resume()
+            }()
+        }
     }
     
     func togglePlayPause(){
         if let player = player{
+            let fraction = player.duration / Double(spectogramData.count)
             if player.isPlaying{
+                timer  = Timer.publish(every: .infinity, on: .main, in: .common).autoconnect()
                 player.pause()
                 isPlaying = false
             }
             else{
+                timer  = Timer.publish(every: fraction, on: .main, in: .common).autoconnect()
                 player.play()
                 isPlaying = true
             }
@@ -112,7 +161,16 @@ struct PlayBack: View {
                         Image(systemName: isPlaying ? "pause.fill" : "play.fill").font(.system(size: 40)).foregroundStyle(Color.purple)
                     }
                     
-                    ProgressView(value: currentTime).progressViewStyle(.linear).frame(maxWidth: 300).padding(10)
+                    if !(spectogramData.isEmpty){
+                        HStack(spacing: 1){
+                            ForEach(spectogramData){ data in
+                                Capsule()
+                                    .foregroundStyle(Color.purple)
+                                    .frame(width: 3, height: CGFloat(data.magnitude*5), alignment: .center)
+                                    .opacity((data.visibility) ? 1 : 0.5)
+                            }
+                        }
+                    }
                     
                     if let player = player {
                         
@@ -155,6 +213,19 @@ struct PlayBack: View {
                     currentTime = player.currentTime/player.duration
                     isPlaying = player.isPlaying
                 }
+                withAnimation(.snappy){
+                    spectogramData[linesCompleted].visibility = true
+                    linesCompleted += 1
+                    if linesCompleted >= spectogramData.count{
+                        timer  = Timer.publish(every: .infinity, on: .main, in: .common).autoconnect()
+                        linesCompleted = 0
+                        currentTime = 0
+                        isPlaying = false
+                        for i in 0..<spectogramData.count {
+                            spectogramData[i].visibility = false
+                        }
+                    }
+                }
             })
         }
         else{
@@ -172,4 +243,70 @@ struct PlayBack: View {
         }
     }
 
+}
+
+class SpectrogramGenerator {
+    
+    func getSpectogramData(url: URL) -> [Double]{
+        return downsample(convertAudioFileToPCMInt16(url: url), decimationFactor: 4000)
+    }
+    
+    private func convertAudioFileToPCMInt16(url: URL) -> [Int16] {
+        
+        let file = try! AVAudioFile(forReading: url)
+        
+        let format = AVAudioFormat(commonFormat: .pcmFormatInt16, sampleRate: file.fileFormat.sampleRate, channels: file.fileFormat.channelCount, interleaved: false)
+        let buf = AVAudioPCMBuffer(pcmFormat: format!, frameCapacity: AVAudioFrameCount(file.length))
+        
+        do {
+            try file.read(into: buf!)
+            
+            let channelCount = Int(buf!.format.channelCount)
+            let length = Int(buf!.frameLength)
+            
+            var pcmData: [Int16] = []
+            
+            for channel in 0..<channelCount {
+                for frame in 0..<length {
+                    let sample = buf!.int16ChannelData![channel][frame]
+                    pcmData.append(sample)
+                }
+            }
+            return pcmData
+        } catch {
+            print("Error reading audio file: \(error)")
+            return []
+        }
+    }
+    
+    
+    
+    private func downsample(_ audioSamples:[Int16], decimationFactor:Int) -> [Double] {
+        let noiseFloor = -50.0
+        
+        var audioSamplesD = [Double](repeating: 0, count: audioSamples.count)
+        
+        vDSP.convertElements(of: audioSamples, to: &audioSamplesD)
+        
+        vDSP.absolute(audioSamplesD, result: &audioSamplesD)
+        
+        vDSP.convert(amplitude: audioSamplesD, toDecibels: &audioSamplesD, zeroReference: Double(Int16.max))
+        
+        audioSamplesD = vDSP.clip(audioSamplesD, to: noiseFloor...0)
+        
+        let filter = [Double](repeating: 1.0 / Double(decimationFactor), count:decimationFactor)
+        
+        let downsamplesLength = Int(audioSamplesD.count / decimationFactor)
+        var downsamples = [Double](repeating: 0.0, count:downsamplesLength)
+        
+        vDSP_desampD(audioSamplesD, vDSP_Stride(decimationFactor), filter, &downsamples, vDSP_Length(downsamplesLength), vDSP_Length(filter.count))
+        
+        return downsamples
+    }
+}
+
+struct DataPoint : Identifiable{
+    let magnitude : Double
+    var visibility : Bool = false
+    let id = UUID()
 }

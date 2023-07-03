@@ -101,7 +101,6 @@ struct HomePage: View {
                                 
                                 QueueComponent(voiceObj: voiceObj)
                                 
-                                
                                 VStack{
                                     Text("Voice Selected:" )
                                         .fontWeight(.bold)
@@ -274,6 +273,7 @@ struct HomePage: View {
                         
                         Button{
                             pageState = .progress
+//                            pageState = .playback
                         } label: {
                             Image(systemName: "arrow.up.circle.fill")
                                 .font(.system(size:60))
@@ -327,6 +327,7 @@ struct HomePage: View {
                 else if(pageState == .playback){
                     PlayBack(
                         link: "https://storage.googleapis.com/vocodes-public" + (pollObj.maybe_public_bucket_wav_audio_path!),
+//                        link: "https://storage.googleapis.com/vocodes-public/tts_inference_output/A/8/C/vocodes_A8C19AF4-6D44-43E9-851A-36130E7F829C.wav",
                         presentationStyle: presentationStyle,
                         voice: pickerSelect.title,
                         tts: tts
@@ -373,6 +374,9 @@ struct HomePage: View {
                             pageState = .home
                         }
                     }, iosPotrait: iosPotrait)
+                    .onAppear{
+                        requestPresentationStyle(.expanded)
+                    }
                 }
             }
             .onAppear {
