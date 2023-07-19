@@ -8,8 +8,8 @@ struct HomePage: View {
     var submitMessage: (String, String, String) -> Void
     var presentationStyle: MSMessagesAppPresentationStyle
     
-    @StateObject private var voiceObj = voiceClass()
-//    @StateObject private var API = FrontendAPIEndpoint(voiceObj: voiceClass(), inferenceToken: &self.s, pollObj: &pollParams())
+    var backendObj = backendAPI()
+//    @StateObject private var API = FrontendAPIEndpoint(backendObj: backendAPI(), inferenceToken: &self.s, pollObj: &pollParams())
     @StateObject var record = Recording()
     
     @State private var names: [voice] = []
@@ -43,7 +43,7 @@ struct HomePage: View {
                     if(!(showTextInput || showRecordAnim)){
                         HStack{
                             
-                            QueueComponent(voiceObj: voiceObj)
+                            QueueComponent(backendObj: backendObj)
                             
                             ZStack{
                                 Capsule().frame(maxHeight: 40)
@@ -99,7 +99,7 @@ struct HomePage: View {
                         if (iosPotrait || iosLandscape){
                             VStack{
                                 
-                                QueueComponent(voiceObj: voiceObj)
+                                QueueComponent(backendObj: backendObj)
                                 
                                 VStack{
                                     Text("Voice Selected:" )
@@ -116,7 +116,7 @@ struct HomePage: View {
                         }
                         else{
                             HStack{
-                                QueueComponent(voiceObj: voiceObj)
+                                QueueComponent(backendObj: backendObj)
                                 
                                 Spacer()
                                 
@@ -259,7 +259,7 @@ struct HomePage: View {
                     Spacer()
                     
                     //TODO: Check the QueueComponent object, as its not printing the text on screen
-                    if(QueueComponent(voiceObj: voiceObj).queue >= 200){
+                    if(QueueComponent(backendObj: backendObj).queue >= 200){
                         Text("Server is Loaded. Cannot process the request at the moment")
                             .font(.system(.title2, design: .rounded))
                             .foregroundStyle(Color.red)
@@ -279,9 +279,9 @@ struct HomePage: View {
                                 .font(.system(size:60))
                         }
                         //TODO: Check the QueueComponent object, as its not disabling the button and foregroundStyle on screen
-                        .disabled(tts.isEmpty || QueueComponent(voiceObj: voiceObj).queue >= 200 || names.isEmpty)
+                        .disabled(tts.isEmpty || QueueComponent(backendObj: backendObj).queue >= 200 || names.isEmpty)
                         .foregroundStyle(
-                            tts.isEmpty || QueueComponent(voiceObj: voiceObj).queue >= 200 || names.isEmpty ?
+                            tts.isEmpty || QueueComponent(backendObj: backendObj).queue >= 200 || names.isEmpty ?
                             Color(red:104/255, green: 104/255, blue: 104/255, opacity: 0.8):
                                 Color.purple
                         )
@@ -305,7 +305,7 @@ struct HomePage: View {
                     }
                 }
                 else if(pageState == .progress){
-                    if(QueueComponent(voiceObj: voiceObj).queue >= 120 && QueueComponent(voiceObj: voiceObj).queue < 200){
+                    if(QueueComponent(backendObj: backendObj).queue >= 120 && QueueComponent(backendObj: backendObj).queue < 200){
                         Text("Server is Loaded. Might take a while to serve your request")
                             .font(.system(.title2, design: .rounded))
                             .foregroundStyle(Color.red)
@@ -315,8 +315,8 @@ struct HomePage: View {
                         .onAppear{
                             Task{
                                 do{
-                                    inferenceToken = try await voiceObj.ttsRequest(tts_model: pickerSelect.model_token, textToConvert: tts, uuid: UUID().uuidString)!
-                                    pollObj = try await voiceObj.pollRequest(inference_job_token: inferenceToken)!
+                                    inferenceToken = try await backendObj.ttsRequest(tts_model: pickerSelect.model_token, textToConvert: tts, uuid: UUID().uuidString)!
+                                    pollObj = try await backendObj.pollRequest(inference_job_token: inferenceToken)!
                                     pageState = .playback
                                 } catch {
                                     print("500 Internal Server Error")
@@ -382,7 +382,7 @@ struct HomePage: View {
             .onAppear {
                 Task{
                     do{
-                        names = try await voiceObj.getVoices()!
+                        names = try await backendObj.getVoices()!
                         pickerSelect = names[0]
                     }
                     catch{

@@ -38,7 +38,7 @@ struct queueData: Codable {
     let pending_job_count: Int
 }
 
-class voiceClass : ObservableObject{
+class backendAPI {
     
     private let listUrl = URL(string:"https://api.fakeyou.com/tts/list")!
     private let ttsUrl = URL(string:"https://api.fakeyou.com/tts/inference")!
@@ -53,7 +53,7 @@ class voiceClass : ObservableObject{
         
         else if (
             voice.user_ratings.positive_count == voice.user_ratings.total_count &&
-            voice.user_ratings.positive_count < 5
+            voice.user_ratings.positive_count < 10
         ){
             return 0
         }
@@ -63,24 +63,28 @@ class voiceClass : ObservableObject{
     }
     
     func getVoices() async throws -> [voice]? {
-        let (data, _) = try await URLSession.shared.data(from: listUrl)
+        var (data, res) = try await URLSession.shared.data(from: listUrl)
+        var response = res as! HTTPURLResponse
+        while (!(response.statusCode == 200 || response.statusCode == 201)){
+            try await Task.sleep(nanoseconds: 2_000_000_000)
+            (data, res) = try await URLSession.shared.data(from: listUrl)
+            response = res as! HTTPURLResponse
+        }
         let decodedResponse = try? JSONDecoder().decode(voices.self, from: data)
-//        var count = 0
-//        while (decodedResponse?.models) == nil {
-//            try await Task.sleep(nanoseconds: 2_000_000_000)
-//            (data, _) = try await URLSession.shared.data(from: listUrl)
-//            decodedResponse = try? JSONDecoder().decode(voices.self, from: data)
-//            print("inference: ", count)
-//            count += 1
-//        }
-        var filteredVoices = (decodedResponse?.models.filter { voice in getRatings(voice) >= 3.0 })!
+        var filteredVoices = (decodedResponse?.models.filter { voice in getRatings(voice) >= 3.2 })!
         filteredVoices.sort{(s1, s2) in getRatings(s1) > getRatings(s2)}
         print(filteredVoices.count)
         return filteredVoices
     }
     
     func getQueue() async throws -> Int {
-        let (data, _) = try await URLSession.shared.data(from: queueUrl)
+        var (data, res) = try await URLSession.shared.data(from: queueUrl)
+        var response = res as! HTTPURLResponse
+        while (!(response.statusCode == 200 || response.statusCode == 201)){
+            try await Task.sleep(nanoseconds: 2_000_000_000)
+            (data, res) = try await URLSession.shared.data(from: queueUrl)
+            response = res as! HTTPURLResponse
+        }
         let decodedResponse = try? JSONDecoder().decode(queueData.self, from: data)
         return (decodedResponse?.pending_job_count)!
     }
@@ -99,17 +103,15 @@ class voiceClass : ObservableObject{
         request.setValue("Basic SAPI:AK_C04F7EF9060205", forHTTPHeaderField: "Authorization")
         request.httpMethod = "POST"
         
-        let (data, _) = try await URLSession.shared.upload(for: request, from: encoded)
+        var (data, res) = try await URLSession.shared.upload(for: request, from: encoded)
+        var response = res as! HTTPURLResponse
+        print("ttsRequest() response: \(response.statusCode)")
+        while (!(response.statusCode == 200 || response.statusCode == 201)){
+            try await Task.sleep(nanoseconds: 2_000_000_000)
+            (data, res) = try await URLSession.shared.upload(for: request, from: encoded)
+            response = res as! HTTPURLResponse
+        }
         let decodedResponse = try? JSONDecoder().decode(generateTtsAudio.self, from: data)
-        // TODO: (inference decoding nil)
-//        var count = 0
-//        while ((decodedResponse?.inference_job_token) == nil && count == 1){
-//            try await Task.sleep(nanoseconds: 2_000_000_000)
-//            (data, _) = try await URLSession.shared.upload(for: request, from: encoded)
-//            decodedResponse = try? JSONDecoder().decode(generateTtsAudio.self, from: data)
-//            print("inference: ", count)
-//            count += 1
-//        }
 //        return "JTINF:an0mwvjabc0ebe6xf7n5hqaab8"
         return decodedResponse?.inference_job_token
     }
@@ -125,15 +127,27 @@ class voiceClass : ObservableObject{
         request.setValue("Basic SAPI:AK_C04F7EF9060205", forHTTPHeaderField: "Authorization")
         request.httpMethod = "GET"
 
-        var (data, _) = try await URLSession.shared.data(for: request)
-        var decodedResponse = try? JSONDecoder().decode(pollRes.self, from: data)
-        var count = 0
-        while (decodedResponse?.state.status != "complete_success") {
-            print(count)
+        var (data, res) = try await URLSession.shared.data(for: request)
+        var response = res as! HTTPURLResponse
+        print("pollRequest() response: \(response.statusCode)")
+        
+        var c1 = 0
+        var c2 = 0
+        while (!(response.statusCode == 200 || response.statusCode == 201)){
+            print("c1: \(c1)")
             try await Task.sleep(nanoseconds: 2_000_000_000)
-            (data, _) = try await URLSession.shared.data(from: pollUrl)
+            (data, res) = try await URLSession.shared.data(for: request)
+            response = res as! HTTPURLResponse
+            c1 += 1
+        }
+        var decodedResponse = try? JSONDecoder().decode(pollRes.self, from: data)
+        
+        while (decodedResponse?.state.status != "complete_success") {
+            print("c2: \(c2)")
+            try await Task.sleep(nanoseconds: 2_000_000_000)
+            (data, res) = try await URLSession.shared.data(for: request)
             decodedResponse = try? JSONDecoder().decode(pollRes.self, from: data)
-            count += 1
+            c2 += 1
             
 //            if(count == WAIT_COUNT){
 //                decodedResponse?.state = pollParams(maybe_result_token: "OOps", maybe_public_bucket_wav_audio_path: "/tts_inference_output/9/c/d/vocodes_9cdd9865-0e10-48f0-9a23-861118ec3286.wav",status: "complete_success")

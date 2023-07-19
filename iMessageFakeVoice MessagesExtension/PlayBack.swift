@@ -59,6 +59,7 @@ struct PlayBack: View {
             URLSession.shared.dataTask(with: URL(string: link)!) {
                 data, response, error in
                 
+                //TODO: CHECK ERROR HANDLING (custom downloaded voice)
                 if let error = error {
                     print("Error:", error)
                 }

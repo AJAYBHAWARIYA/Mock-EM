@@ -2,16 +2,16 @@ import SwiftUI
 
 struct QueueComponent: View{
     
-    let voiceObj : voiceClass
+    let backendObj : backendAPI
     
     @State private(set) var queue : Int = 0
     
     let timer = Timer.publish(every: 5.0, on: .main, in: .common).autoconnect()
     
-    func getQueue(){
+    private func getQueue(){
         Task{
             do{
-                queue = try await voiceObj.getQueue()
+                queue = try await backendObj.getQueue()
             }
             catch{
                 print("404 queue not found")
