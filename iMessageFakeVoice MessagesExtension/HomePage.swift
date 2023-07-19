@@ -9,15 +9,11 @@ struct HomePage: View {
     var presentationStyle: MSMessagesAppPresentationStyle
     
     var backendObj = backendAPI()
-//    @StateObject private var API = FrontendAPIEndpoint(backendObj: backendAPI(), inferenceToken: &self.s, pollObj: &pollParams())
+    @StateObject private var FrontendObj = FrontendAPIEndpoint()
     @StateObject var record = Recording()
     
-    @State private var names: [voice] = []
     @State private var searchText = ""
-    @State private var pickerSelect: voice = voice(model_token: "", title: "", user_ratings: rating(positive_count: 0, total_count: 0))
     @State var tts: String = ""
-    @State var inferenceToken: String = ""
-    @State var pollObj: pollParams = pollParams()
     @State var showTextInput : Bool = false
     @State var showRecordAnim : Bool = false
     @State private var isRecording : Bool = false
@@ -43,7 +39,7 @@ struct HomePage: View {
                     if(!(showTextInput || showRecordAnim)){
                         HStack{
                             
-                            QueueComponent(backendObj: backendObj)
+                            QueueComponent(frontendObj: FrontendObj)
                             
                             ZStack{
                                 Capsule().frame(maxHeight: 40)
@@ -78,20 +74,20 @@ struct HomePage: View {
                         
                         // Picker View
                         VStack{
-                            if(names.isEmpty){
+                            if(FrontendObj.names.isEmpty){
                                 GradientLoader()
                                     .padding(10)
                             }
                             else{
-                                Picker("name", selection: $pickerSelect) {
+                                Picker("name", selection: $FrontendObj.pickerSelect) {
                                     ForEach(searchResults, id: \.self) { name in
                                         Text(name.title)
                                             .font(.system(.title2, design: .rounded))
                                     }
                                 }
                                 .pickerStyle(.wheel)
-                                .onChange(of: searchResults, perform: {searchResults in if (!searchResults.isEmpty) {pickerSelect = searchResults[0]}})
-                                .onChange(of: pickerSelect, perform: {_ in inferenceToken = ""; pollObj.maybe_public_bucket_wav_audio_path! = "" })
+                                .onChange(of: searchResults, perform: {searchResults in if (!searchResults.isEmpty) {FrontendObj.pickerSelect = searchResults[0]}})
+                                .onChange(of: FrontendObj.pickerSelect, perform: {_ in FrontendObj.inferenceToken = ""; FrontendObj.pollObj.maybe_public_bucket_wav_audio_path! = "" })
                             }
                         }
                     }
@@ -99,14 +95,14 @@ struct HomePage: View {
                         if (iosPotrait || iosLandscape){
                             VStack{
                                 
-                                QueueComponent(backendObj: backendObj)
+                                QueueComponent(frontendObj: FrontendObj)
                                 
                                 VStack{
                                     Text("Voice Selected:" )
                                         .fontWeight(.bold)
                                         .font(.system(.title2, design: .rounded))
                                     
-                                    Text("\(pickerSelect.title)")
+                                    Text("\(FrontendObj.pickerSelect.title)")
                                         .font(.system(.title3, design: .rounded))
                                         .opacity(0.8)
                                         .frame(maxHeight: 20)
@@ -116,7 +112,7 @@ struct HomePage: View {
                         }
                         else{
                             HStack{
-                                QueueComponent(backendObj: backendObj)
+                                QueueComponent(frontendObj: FrontendObj)
                                 
                                 Spacer()
                                 
@@ -124,7 +120,7 @@ struct HomePage: View {
                                     Text("Voice Selected:" )
                                         .fontWeight(.bold)
                                         .font(.system(.title2, design: .rounded))
-                                    Text("\(pickerSelect.title)")
+                                    Text("\(FrontendObj.pickerSelect.title)")
                                         .font(.system(.title3, design: .rounded))
                                         .opacity(0.8)
                                 }
@@ -152,7 +148,7 @@ struct HomePage: View {
                                         .padding(.trailing, 15)
                                         .foregroundColor(colorScheme == .dark ? .white : .black)
                                         .searchable(text: $tts)
-                                        .onChange(of: tts, perform: {_ in inferenceToken = ""; pollObj.maybe_public_bucket_wav_audio_path! = "" })
+                                        .onChange(of: tts, perform: {_ in FrontendObj.inferenceToken = ""; FrontendObj.pollObj.maybe_public_bucket_wav_audio_path! = "" })
                                         .submitLabel(.send)
                                         .onTapGesture {
                                             requestPresentationStyle(.expanded)
@@ -258,8 +254,7 @@ struct HomePage: View {
                     
                     Spacer()
                     
-                    //TODO: Check the QueueComponent object, as its not printing the text on screen
-                    if(QueueComponent(backendObj: backendObj).queue >= 200){
+                    if(FrontendObj.queue >= 200){
                         Text("Server is Loaded. Cannot process the request at the moment")
                             .font(.system(.title2, design: .rounded))
                             .foregroundStyle(Color.red)
@@ -278,10 +273,9 @@ struct HomePage: View {
                             Image(systemName: "arrow.up.circle.fill")
                                 .font(.system(size:60))
                         }
-                        //TODO: Check the QueueComponent object, as its not disabling the button and foregroundStyle on screen
-                        .disabled(tts.isEmpty || QueueComponent(backendObj: backendObj).queue >= 200 || names.isEmpty)
+                        .disabled(tts.isEmpty || FrontendObj.queue >= 200 || FrontendObj.names.isEmpty)
                         .foregroundStyle(
-                            tts.isEmpty || QueueComponent(backendObj: backendObj).queue >= 200 || names.isEmpty ?
+                            tts.isEmpty || FrontendObj.queue >= 200 || FrontendObj.names.isEmpty ?
                             Color(red:104/255, green: 104/255, blue: 104/255, opacity: 0.8):
                                 Color.purple
                         )
@@ -305,7 +299,7 @@ struct HomePage: View {
                     }
                 }
                 else if(pageState == .progress){
-                    if(QueueComponent(backendObj: backendObj).queue >= 120 && QueueComponent(backendObj: backendObj).queue < 200){
+                    if(FrontendObj.queue >= 120 && FrontendObj.queue < 200){
                         Text("Server is Loaded. Might take a while to serve your request")
                             .font(.system(.title2, design: .rounded))
                             .foregroundStyle(Color.red)
@@ -314,22 +308,17 @@ struct HomePage: View {
                     ProgressAnim()
                         .onAppear{
                             Task{
-                                do{
-                                    inferenceToken = try await backendObj.ttsRequest(tts_model: pickerSelect.model_token, textToConvert: tts, uuid: UUID().uuidString)!
-                                    pollObj = try await backendObj.pollRequest(inference_job_token: inferenceToken)!
-                                    pageState = .playback
-                                } catch {
-                                    print("500 Internal Server Error")
-                                }
+                                await FrontendObj.makeVoiceRequest(tts: tts)
+                                pageState = .playback
                             }
                         }
                 }
                 else if(pageState == .playback){
                     PlayBack(
-                        link: "https://storage.googleapis.com/vocodes-public" + (pollObj.maybe_public_bucket_wav_audio_path!),
+                        link: "https://storage.googleapis.com/vocodes-public" + (FrontendObj.pollObj.maybe_public_bucket_wav_audio_path!),
 //                        link: "https://storage.googleapis.com/vocodes-public/tts_inference_output/A/8/C/vocodes_A8C19AF4-6D44-43E9-851A-36130E7F829C.wav",
                         presentationStyle: presentationStyle,
-                        voice: pickerSelect.title,
+                        voice: FrontendObj.pickerSelect.title,
                         tts: tts
                     )
                     
@@ -337,9 +326,9 @@ struct HomePage: View {
                         Spacer()
                         
                         Button{
-                            inferenceToken = ""
+                            FrontendObj.inferenceToken = ""
                             tts = ""
-                            pollObj = pollParams()
+                            FrontendObj.pollObj = pollParams()
                             pageState = .home
                             showTextInput.toggle()
                         } label: {
@@ -354,7 +343,7 @@ struct HomePage: View {
                         Spacer()
                         
                         Button{
-                            submitMessage("https://storage.googleapis.com/vocodes-public" + (pollObj.maybe_public_bucket_wav_audio_path!), pickerSelect.title, tts)
+                            submitMessage("https://storage.googleapis.com/vocodes-public" + (FrontendObj.pollObj.maybe_public_bucket_wav_audio_path!), FrontendObj.pickerSelect.title, tts)
                             requestPresentationStyle(.compact)
                         } label: {
                             HStack{
@@ -380,16 +369,7 @@ struct HomePage: View {
                 }
             }
             .onAppear {
-                Task{
-                    do{
-                        names = try await backendObj.getVoices()!
-                        pickerSelect = names[0]
-                    }
-                    catch{
-                        print("Mayank is here")
-                    }
-                }
-            }
+                FrontendObj.getVoices()            }
 //            .foregroundStyle(Color(red:29/255, green: 29/255, blue: 31/255))
         }
         else{
@@ -400,9 +380,9 @@ struct HomePage: View {
     
     var searchResults: [voice] {
         if searchText.isEmpty {
-            return names
+            return FrontendObj.names
         } else {
-            return names.filter { name in name.title.contains(searchText) }
+            return FrontendObj.names.filter { name in name.title.contains(searchText) }
         }
     }
 }

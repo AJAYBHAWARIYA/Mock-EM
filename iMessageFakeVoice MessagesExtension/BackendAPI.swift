@@ -2,39 +2,39 @@ import Foundation
 import AVFoundation
 
 
-struct rating: Codable, Hashable {
+public struct rating: Codable, Hashable {
     let positive_count: Double
     let total_count: Double
 }
 
-struct voice : Codable, Hashable{
+public struct voice : Codable, Hashable{
     let model_token: String
     let title: String
     let user_ratings: rating
 }
 
-struct voices: Codable {
+public struct voices: Codable {
     var models: [voice] = []
 }
 
-struct generateTtsAudio: Codable {
+public struct generateTtsAudio: Codable {
     var success: Bool = false
     var inference_job_token: String = ""
 }
 
-struct pollParams : Codable{
+public struct pollParams : Codable{
     var maybe_result_token: String? = ""
     var maybe_public_bucket_wav_audio_path: String? = ""
     var status: String = ""
 }
 
-struct pollRes: Codable {
+public struct pollRes: Codable {
     
     var success: Bool = false
     var state: pollParams = pollParams()
 }
 
-struct queueData: Codable {
+public struct queueData: Codable {
     let pending_job_count: Int
 }
 
