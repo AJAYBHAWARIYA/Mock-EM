@@ -228,11 +228,12 @@ struct PlayBack: View {
                     }
                 }
             })
+            .background(Color("AppBackground"))
         }
         else{
             HStack{
                 Image(systemName: "wifi.slash")
-                    .foregroundStyle(Color.red)
+                    .foregroundStyle(Color("Warning"))
                     .padding(10)
                     .font(.title)
                 
@@ -241,6 +242,7 @@ struct PlayBack: View {
                     .foregroundStyle(Color(white: 0.4745))
                     .font(.system(.title3, design: .rounded))
             }
+            .background(Color("AppBackground"))
         }
     }
 

@@ -47,26 +47,36 @@ struct HomePage: View {
                                     .padding(.horizontal, 8)
                                     .opacity(0.5)
                                 ZStack(alignment: .trailing){
-                                    TextField("Voices", text: $searchText)
-                                        .padding(.horizontal,30)
-                                        .padding(.trailing, 10)
-                                        .foregroundColor(colorScheme == .dark ? .white : .black)
-                                        .searchable(text: $searchText)
-                                        .focused($voiceIsFocused)
-                                        .submitLabel(.search)
-                                        .onTapGesture {
-                                            requestPresentationStyle(.expanded)
+                                    ZStack(alignment: .leading){
+                                        if (searchText.isEmpty){
+                                            Text("Voices")
+                                                .foregroundStyle(Color("Beige"))
+                                                .padding(.leading, 25)
+                                                .opacity(0.5)
                                         }
-                                    
+                                        TextField("", text: $searchText)
+                                            .padding(.horizontal, 25)
+                                            .padding(.trailing, 20)
+//                                            .foregroundColor(colorScheme == .dark ? .white : .black)
+                                            .foregroundStyle(Color("Beige"))
+                                            .searchable(text: $searchText)
+                                            .focused($voiceIsFocused)
+                                            .submitLabel(.search)
+                                            .onTapGesture {
+                                                requestPresentationStyle(.expanded)
+                                            }
+                                    }
                                     if !searchText.isEmpty{
                                         Image(systemName: "xmark.circle.fill")
-                                            .foregroundColor(.secondary)
+                                            .foregroundColor(Color("Beige"))
+                                            .font(.title2)
                                             .onTapGesture {
                                                 searchText = ""
                                                 voiceIsFocused = false
                                             }
                                             .padding(.trailing, 17)
                                     }
+//                                }
                                 }
                             }
                             .padding(.top, 10)
@@ -83,6 +93,7 @@ struct HomePage: View {
                                     ForEach(searchResults, id: \.self) { name in
                                         Text(name.title)
                                             .font(.system(.title2, design: .rounded))
+                                            .foregroundStyle(Color("Beige"))
                                     }
                                 }
                                 .pickerStyle(.wheel)
@@ -107,7 +118,8 @@ struct HomePage: View {
                                         .opacity(0.8)
                                         .frame(maxHeight: 20)
                                         .padding(.vertical, 10)
-                                }
+                                        
+                                }.foregroundStyle(Color("Beige"))
                             }
                         }
                         else{
@@ -125,6 +137,7 @@ struct HomePage: View {
                                         .opacity(0.8)
                                 }
                                 .frame(maxHeight: 30)
+                                .foregroundStyle(Color("Beige"))
                                 .padding(.top, 10)
                                 
                                 Spacer()
@@ -139,33 +152,43 @@ struct HomePage: View {
                         if(showTextInput){
                             ZStack{
                                 Capsule().frame(maxHeight: 40)
-                                    .padding()
                                     .foregroundStyle(Color.purple)
+                                    .padding(.horizontal, 8)
                                     .opacity(0.5)
                                 ZStack(alignment: .trailing){
-                                    TextField("Text to Speech", text: $tts)
-                                        .padding(.horizontal,30)
-                                        .padding(.trailing, 15)
-                                        .foregroundColor(colorScheme == .dark ? .white : .black)
-                                        .searchable(text: $tts)
-                                        .onChange(of: tts, perform: {_ in FrontendObj.inferenceToken = ""; FrontendObj.pollObj.maybe_public_bucket_wav_audio_path! = "" })
-                                        .submitLabel(.send)
-                                        .onTapGesture {
-                                            requestPresentationStyle(.expanded)
+                                    ZStack(alignment: .leading){
+                                        if (tts.isEmpty){
+                                            Text("Text to Speech")
+                                                .foregroundStyle(Color("Beige"))
+                                                .padding(.leading, 25)
+                                                .opacity(0.5)
                                         }
-                                        .focused($ttsIsFocused)
-                                    
-                                        Image(systemName: "xmark.circle.fill")
-                                            .foregroundColor(.secondary)
-                                            .font(.title2)
-                                            .onTapGesture {
-                                                tts = ""
-                                                ttsIsFocused = false
-                                                showTextInput.toggle()
-                                            }
+                                        TextField("", text: $tts)
+                                            .padding(.horizontal, 25)
                                             .padding(.trailing, 20)
+    //                                        .foregroundColor(colorScheme == .dark ? .white : .black)
+                                            .foregroundStyle(Color("Beige"))
+                                            .searchable(text: $tts)
+                                            .onChange(of: tts, perform: {_ in FrontendObj.inferenceToken = ""; FrontendObj.pollObj.maybe_public_bucket_wav_audio_path! = "" })
+                                            .submitLabel(.send)
+                                            .onTapGesture {
+                                                requestPresentationStyle(.expanded)
+                                            }
+                                            .focused($ttsIsFocused)
+                                    }
+                                    
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(Color("Beige"))
+                                        .font(.title2)
+                                        .onTapGesture {
+                                            tts = ""
+                                            ttsIsFocused = false
+                                            showTextInput.toggle()
+                                        }
+                                        .padding(.trailing, 20)
                                 }
                             }
+                            .padding(.vertical, 8)
                         }
                         else if(showRecordAnim){
                             
@@ -174,6 +197,7 @@ struct HomePage: View {
                                     .italic()
                                     .opacity(0.8)
                                     .padding(.bottom, 5)
+                                    .foregroundStyle(Color("Beige"))
                                 
                                 Button(action: {
                                     isRecording = false
@@ -185,7 +209,7 @@ struct HomePage: View {
                                         Circle()
                                             .frame(maxWidth: 60, maxHeight:60)
                                             .scaleEffect(isRecording ? 1.5 : 1.0)
-                                            .foregroundColor(Color.red)
+                                            .foregroundColor(Color("Warning"))
                                             .animation(.easeIn(duration: 2), value: isRecording)
                                         
                                         Image(systemName: "mic.fill")
@@ -218,11 +242,13 @@ struct HomePage: View {
                                     .fontWeight(.bold)
                                     .font(.system(.title2, design: .rounded))
                                     .padding(.bottom,2)
+                                    .foregroundStyle(Color("Beige"))
                                 
                                 ScrollView{
                                     Text(record.transcript)
                                         .multilineTextAlignment(.center)
                                         .padding(10)
+                                        .foregroundStyle(Color("Beige"))
                                 }
                                 .frame(maxWidth: 300, maxHeight: 100)
                             }
@@ -257,7 +283,7 @@ struct HomePage: View {
                     if(FrontendObj.queue >= 200){
                         Text("Server is Loaded. Cannot process the request at the moment")
                             .font(.system(.title2, design: .rounded))
-                            .foregroundStyle(Color.red)
+                            .foregroundStyle(Color("Warning"))
                             .multilineTextAlignment(.center)
                     }
                     
@@ -302,7 +328,7 @@ struct HomePage: View {
                     if(FrontendObj.queue >= 120 && FrontendObj.queue < 200){
                         Text("Server is Loaded. Might take a while to serve your request")
                             .font(.system(.title2, design: .rounded))
-                            .foregroundStyle(Color.red)
+                            .foregroundStyle(Color("Warning"))
                             .padding(.bottom, 10)
                     }
                     ProgressAnim()
@@ -369,12 +395,12 @@ struct HomePage: View {
                 }
             }
             .onAppear {
-                FrontendObj.getVoices()            }
-//            .foregroundStyle(Color(red:29/255, green: 29/255, blue: 31/255))
+                FrontendObj.getVoices()
+            }
+            .background(Color("AppBackground"))
         }
         else{
-            NoNetworkView()
-//                .foregroundStyle(Color(red:29/255, green: 29/255, blue: 31/255))
+            NoNetworkView().background(Color("AppBackground"))
         }
     }
     

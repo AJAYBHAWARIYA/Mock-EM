@@ -30,7 +30,7 @@ struct NoNetworkView: View {
     var body: some View {
         VStack{
             Image(systemName: "wifi.slash")
-                .foregroundStyle(Color.red)
+                .foregroundStyle(Color("Warning"))
                 .padding(10)
                 .font(.largeTitle)
             

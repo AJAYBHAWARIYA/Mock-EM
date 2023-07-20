@@ -35,7 +35,7 @@ struct CreditsView: View {
                                     .font(.title2)
                                 if(!iosPotrait){
                                     Text("Back")
-                                        .font(.title2)
+                                        .font(.system(.title2, design: .rounded))
                                 }
                             }
                             .foregroundStyle(
