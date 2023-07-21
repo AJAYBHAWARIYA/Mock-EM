@@ -1,3 +1,9 @@
+//
+//  HomePage.swift
+//  iMessageFakeVoice MessagesExtension
+//
+//  Created by Mayank Tamakuwala and Ajay Singh Bhawariya on 6/4/23.
+
 import SwiftUI
 import AVFoundation
 import Messages
@@ -57,7 +63,6 @@ struct HomePage: View {
                                         TextField("", text: $searchText)
                                             .padding(.horizontal, 25)
                                             .padding(.trailing, 20)
-//                                            .foregroundColor(colorScheme == .dark ? .white : .black)
                                             .foregroundStyle(Color("Beige"))
                                             .searchable(text: $searchText)
                                             .focused($voiceIsFocused)
@@ -76,7 +81,6 @@ struct HomePage: View {
                                             }
                                             .padding(.trailing, 17)
                                     }
-//                                }
                                 }
                             }
                             .padding(.top, 10)

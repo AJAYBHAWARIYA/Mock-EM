@@ -2,8 +2,7 @@
 //  NoNetworkView.swift
 //  iMessageFakeVoice MessagesExtension
 //
-//  Created by Mayank Tamakuwala on 6/17/23.
-//
+//  Created by Mayank Tamakuwala and Ajay Singh Bhawariya on 6/4/23.
 
 import SwiftUI
 import Network
