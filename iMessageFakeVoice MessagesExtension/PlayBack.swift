@@ -187,15 +187,21 @@ struct PlayBack: View {
                         let totatTime = player.duration
                         
                         if(totatTime.isNaN || player.currentTime.isNaN){
-                            Text("00:00/00:00").padding(10)
+                            Text("00:00/00:00")
+                                .padding(10)
+                                .foregroundStyle(Color("Beige"))
                         }
                         else if (player.currentTime < 0){
-                            Text("00:00/\(MMSSTimeFormattor(seconds: totatTime))").padding(10)
+                            Text("00:00/\(MMSSTimeFormattor(seconds: totatTime))")
+                                .padding(10)
+                                .foregroundStyle(Color("Beige"))
                         }
                         else{
                             Text(
                                 "\(MMSSTimeFormattor(seconds: currentTime*totatTime))/\(MMSSTimeFormattor(seconds: totatTime))"
-                            ).padding(10)
+                            )
+                            .padding(10)
+                            .foregroundStyle(Color("Beige"))
                         }
                     }
                 }
@@ -205,6 +211,7 @@ struct PlayBack: View {
                         Text(voice)
                     }
                     .frame(maxWidth: 540, maxHeight: 30, alignment: .leading)
+                    .foregroundStyle(Color("Beige"))
                     .padding(.horizontal, 7)
                     .padding(.leading, 5)
                     
@@ -214,6 +221,7 @@ struct PlayBack: View {
                     }
                     .frame(maxWidth: 540, maxHeight: 50, alignment: .leading)
                     .padding(.horizontal, 7)
+                    .foregroundStyle(Color("Beige"))
                     .padding(.leading, 5)
                     
                     Spacer()

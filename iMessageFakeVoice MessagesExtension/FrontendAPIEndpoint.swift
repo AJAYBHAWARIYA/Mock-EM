@@ -17,7 +17,6 @@ class FrontendAPIEndpoint : ObservableObject {
     
     func getVoices(){
         Task{
-            @MainActor in
             do{
                 names = try await backendObj.getVoices()!
                 pickerSelect = names[0]
