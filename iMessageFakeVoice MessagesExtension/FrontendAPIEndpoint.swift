@@ -6,6 +6,7 @@
 
 import SwiftUI
 
+@MainActor
 class FrontendAPIEndpoint : ObservableObject {
     
     private var backendObj = backendAPI()
