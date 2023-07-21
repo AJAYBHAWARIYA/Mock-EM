@@ -302,8 +302,6 @@ class SpectrogramGenerator {
         }
     }
     
-    
-    
     private func downsample(_ audioSamples:[Int16], decimationFactor:Int) -> [Double] {
         let noiseFloor = -50.0
         
