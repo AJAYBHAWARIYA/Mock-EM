@@ -27,16 +27,24 @@ class NetworkMonitor: ObservableObject {
 
 struct NoNetworkView: View {
     var body: some View {
-        VStack{
-            Image(systemName: "wifi.slash")
-                .foregroundStyle(Color("Warning"))
-                .padding(10)
-                .font(.largeTitle)
-            
-            Text("Network connection\nseems to be offline.\nPlease check your\nconnectivity.")
-                .multilineTextAlignment(.center)
-                .foregroundStyle(Color(white: 0.4745))
-                .font(.system(.title2, design: .rounded))
+        HStack{
+            Spacer()
+            VStack{
+                Spacer()
+                
+                Image(systemName: "wifi.slash")
+                    .foregroundStyle(Color("Warning"))
+                    .padding(10)
+                    .font(.largeTitle)
+                
+                Text("Network connection\nseems to be offline.\nPlease check your\nconnectivity.")
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(Color(white: 0.4745))
+                    .font(.system(.title2, design: .rounded))
+                
+                Spacer()
+            }
+            Spacer()
         }
     }
 }

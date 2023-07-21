@@ -161,6 +161,9 @@ struct PlayBack: View {
     var body: some View {
         if networkMonitor.isConnected{
             VStack{
+                if(presentationStyle == .transcript){
+                    Spacer()
+                }
                 HStack{
                     Button{
                         togglePlayPause()
@@ -203,6 +206,7 @@ struct PlayBack: View {
                     }
                     .frame(maxWidth: 540, maxHeight: 30, alignment: .leading)
                     .padding(.horizontal, 7)
+                    .padding(.leading, 5)
                     
                     HStack(alignment: .firstTextBaseline) {
                         Text("Transcript:").fontWeight(.bold)
@@ -210,6 +214,9 @@ struct PlayBack: View {
                     }
                     .frame(maxWidth: 540, maxHeight: 50, alignment: .leading)
                     .padding(.horizontal, 7)
+                    .padding(.leading, 5)
+                    
+                    Spacer()
                 }
             }
             .onAppear{
@@ -237,18 +244,25 @@ struct PlayBack: View {
             .background(Color("AppBackground"))
         }
         else{
-            HStack{
-                Image(systemName: "wifi.slash")
-                    .foregroundStyle(Color("Warning"))
-                    .padding(10)
-                    .font(.title)
+            VStack{
+                Spacer()
                 
-                Text("Network connection seems to be offline.\nPlease check your connectivity.")
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(Color(white: 0.4745))
-                    .font(.system(.title3, design: .rounded))
-            }
-            .background(Color("AppBackground"))
+                HStack{
+                    Spacer()
+                    Image(systemName: "wifi.slash")
+                        .foregroundStyle(Color("Warning"))
+                        .padding(10)
+                        .font(.title)
+                    
+                    Text("Network connection seems to be offline.\nPlease check your connectivity.")
+                        .multilineTextAlignment(.center)
+                        .foregroundStyle(Color(white: 0.4745))
+                        .font(.system(.title3, design: .rounded))
+                    Spacer()
+                }
+                
+                Spacer()
+            }.background(Color("AppBackground"))
         }
     }
 

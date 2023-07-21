@@ -117,18 +117,18 @@ struct ContentView: View {
     @StateObject var networkMonitor = NetworkMonitor()
     
     var body: some View {
-        if(presentationStyle == .compact){
-            HomePage(
-                requestPresentationStyle: requestPresentationStyle,
-                submitMessage: submitMessage!,
+        if(presentationStyle == .transcript) {
+            PlayBack(
+                message: selectedMessage,
                 presentationStyle: presentationStyle
             )
             .environmentObject(networkMonitor)
             .font(.system(.body, design: .rounded))
         }
-        else{
-            PlayBack(
-                message: selectedMessage,
+        else {
+            HomePage(
+                requestPresentationStyle: requestPresentationStyle,
+                submitMessage: submitMessage!,
                 presentationStyle: presentationStyle
             )
             .environmentObject(networkMonitor)

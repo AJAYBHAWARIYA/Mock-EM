@@ -399,7 +399,7 @@
 				DEVELOPMENT_TEAM = 8KY6HSRYV6;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iMessageFakeVoice MessagesExtension/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = iMessageFakeVoice;
+				INFOPLIST_KEY_CFBundleDisplayName = "Mock'Em";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "";
@@ -430,7 +430,7 @@
 				DEVELOPMENT_TEAM = 8KY6HSRYV6;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iMessageFakeVoice MessagesExtension/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = iMessageFakeVoice;
+				INFOPLIST_KEY_CFBundleDisplayName = "Mock'Em";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "";

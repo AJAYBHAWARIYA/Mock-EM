@@ -344,6 +344,7 @@ struct HomePage: View {
                         }
                 }
                 else if(pageState == .playback){
+                    Spacer()
                     PlayBack(
                         link: "https://storage.googleapis.com/vocodes-public" + (FrontendObj.pollObj.maybe_public_bucket_wav_audio_path!),
 //                        link: "https://storage.googleapis.com/vocodes-public/tts_inference_output/A/8/C/vocodes_A8C19AF4-6D44-43E9-851A-36130E7F829C.wav",
@@ -386,6 +387,7 @@ struct HomePage: View {
                         
                         Spacer()
                     }
+                    Spacer()
                 }
                 else if(pageState == .credits){
                     CreditsView(goBack: {

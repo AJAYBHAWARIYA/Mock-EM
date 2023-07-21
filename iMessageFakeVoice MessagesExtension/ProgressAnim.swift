@@ -17,6 +17,7 @@ struct ProgressAnim: View {
     
     var body: some View {
         HStack{
+            Spacer()
             VStack{
                 BinaryTextView(value: data[0], font: Font.title3, delay: 0.0)
             }
@@ -38,12 +39,14 @@ struct ProgressAnim: View {
             }
             
             VStack{
+                Spacer()
                 ForEach(9...13, id: \.self){
                     i in
                     if(i == 9 || i == 13){BinaryTextView(value: data[i], font: Font.title2, delay: 0.3)}
                     else if(i == 10 || i == 12){BinaryTextView(value: data[i], font: Font.title, delay: 0.3)}
                     else{BinaryTextView(value: data[i], font: Font.largeTitle, delay: 0.3)}
                 }
+                Spacer()
             }
             
             VStack{
@@ -65,6 +68,7 @@ struct ProgressAnim: View {
             VStack{
                 BinaryTextView(value: data[22], font: Font.title3, delay: 0.6)
             }
+            Spacer()
         }
     }
 }
