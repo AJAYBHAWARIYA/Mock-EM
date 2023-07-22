@@ -10,7 +10,6 @@ struct CreditsView: View {
     
     var goBack: () -> Void
     var iosPotrait: Bool
-    @Environment(\.colorScheme) var colorScheme: ColorScheme
     
     var body: some View {
         ScrollView(){
@@ -38,9 +37,7 @@ struct CreditsView: View {
                                 }
                             }
                             .foregroundStyle(
-                                colorScheme == .light ?
-                                Color(red: 98/255, green: 91/255, blue: 113/255) :
-                                    Color(red: 204/255, green: 194/255, blue: 220/255)
+                                Color(red: 204/255, green: 194/255, blue: 220/255)
                             )
                         }
                     }
@@ -56,7 +53,7 @@ struct CreditsView: View {
                     }
                     .padding(.leading,10)
                     .font(.system(.title2, design: .rounded))
-                    .foregroundColor(Color(red: 208/255, green: 150/255,blue: 255/255 ))
+                    .foregroundColor(Color("Secondary"))
                     
                 }
                 Group{
@@ -85,7 +82,7 @@ struct CreditsView: View {
                                 Text("Mayank Devangkumar Tamakuwala")
                                 HStack{
                                     Link(destination: URL(string: "https://github.com/MayankTamakuwala")!, label: {
-                                        Image(colorScheme == .dark ? "GithubDark" : "GithubLight")
+                                        Image("GithubDark")
                                             .resizable()
                                             .scaledToFill()
                                             .frame(width: 50, height: 50)
@@ -119,7 +116,7 @@ struct CreditsView: View {
                                 Text("Ajay Singh Bhawariya")
                                 HStack{
                                     Link(destination: URL(string: "https://github.com/AJAYBHAWARIYA")!, label: {
-                                        Image(colorScheme == .dark ? "GithubDark" : "GithubLight")
+                                        Image("GithubDark")
                                             .resizable()
                                             .scaledToFill()
                                             .frame(width: 50, height: 50)
@@ -136,10 +133,10 @@ struct CreditsView: View {
                             }
                             
                         }
-                        Text("Email: brolookatthis@gmail.com")
+                        Text("Email: mayjaydevs@gmail.com")
                     }
                     .font(.system(.title2, design: .rounded))
-                    .foregroundColor(Color(red: 208/255, green: 150/255,blue: 255/255 ))
+                    .foregroundColor(Color("Secondary"))
                 }
                 Group{
                     Divider()
@@ -164,7 +161,7 @@ struct CreditsView: View {
                         Text("Special Thanks to @echalon for creating FakeYou that provides data crucial for this application")
                     }
                     .font(.system(.title2, design: .rounded))
-                    .foregroundColor(Color(red: 208/255, green: 150/255,blue: 255/255 ))
+                    .foregroundColor(Color("Secondary"))
                     
                 }
             }.padding([.horizontal,.bottom], 10)

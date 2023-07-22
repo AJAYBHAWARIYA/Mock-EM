@@ -44,7 +44,7 @@ class FrontendAPIEndpoint : ObservableObject {
                 queue = try await backendObj.getQueue()
             }
             catch{
-                print("404 queue not found")
+                print("Queue not retrieved")
             }
         }
     }

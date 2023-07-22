@@ -27,7 +27,6 @@ struct HomePage: View {
     
     @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
     @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
-    @Environment(\.colorScheme) var colorScheme: ColorScheme
     
     @EnvironmentObject var networkMonitor: NetworkMonitor
 
@@ -170,7 +169,6 @@ struct HomePage: View {
                                         TextField("", text: $tts)
                                             .padding(.horizontal, 25)
                                             .padding(.trailing, 20)
-    //                                        .foregroundColor(colorScheme == .dark ? .white : .black)
                                             .foregroundStyle(Color("Beige"))
                                             .searchable(text: $tts)
                                             .onChange(of: tts, perform: {_ in FrontendObj.inferenceToken = ""; FrontendObj.pollObj.maybe_public_bucket_wav_audio_path! = "" })
@@ -306,7 +304,7 @@ struct HomePage: View {
                         .disabled(tts.isEmpty || FrontendObj.queue >= 200 || FrontendObj.names.isEmpty)
                         .foregroundStyle(
                             tts.isEmpty || FrontendObj.queue >= 200 || FrontendObj.names.isEmpty ?
-                            Color(red:104/255, green: 104/255, blue: 104/255, opacity: 0.8):
+                            Color("Disabled"):
                                 Color.purple
                         )
                         

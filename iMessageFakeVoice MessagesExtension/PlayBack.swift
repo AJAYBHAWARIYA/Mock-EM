@@ -87,7 +87,9 @@ struct PlayBack: View {
                     }
                 }()
                 spectogramData = {
-                    let x = SpectrogramGenerator().getSpectogramData(url: url)
+                    let totalSampleCount = AVAsset(url: url).audioBufferAndSampleCounts().sampleCount
+                    let decimationFactor = totalSampleCount / Int(500.0 / Double((2 + 3)))
+                    let x = SpectrogramGenerator(decimationFactor: decimationFactor).getSpectogramData(url: url)
                     var myPoints = [DataPoint]()
                     for i in 0 ..< x.count {
                         myPoints.append(DataPoint(magnitude: ((x[i]*(-1.0))*10.0).truncatingRemainder(dividingBy: 10.0)))
@@ -182,26 +184,28 @@ struct PlayBack: View {
                         }
                     }
                     
-                    if let player = player {
-                        
-                        let totatTime = player.duration
-                        
-                        if(totatTime.isNaN || player.currentTime.isNaN){
-                            Text("00:00/00:00")
+                    if (presentationStyle != .transcript) {
+                        if let player = player {
+                            
+                            let totatTime = player.duration
+                            
+                            if(totatTime.isNaN || player.currentTime.isNaN){
+                                Text("00:00/00:00")
+                                    .padding(10)
+                                    .foregroundStyle(Color("Beige"))
+                            }
+                            else if (player.currentTime < 0){
+                                Text("00:00/\(MMSSTimeFormattor(seconds: totatTime))")
+                                    .padding(10)
+                                    .foregroundStyle(Color("Beige"))
+                            }
+                            else{
+                                Text(
+                                    "\(MMSSTimeFormattor(seconds: currentTime*totatTime))/\(MMSSTimeFormattor(seconds: totatTime))"
+                                )
                                 .padding(10)
                                 .foregroundStyle(Color("Beige"))
-                        }
-                        else if (player.currentTime < 0){
-                            Text("00:00/\(MMSSTimeFormattor(seconds: totatTime))")
-                                .padding(10)
-                                .foregroundStyle(Color("Beige"))
-                        }
-                        else{
-                            Text(
-                                "\(MMSSTimeFormattor(seconds: currentTime*totatTime))/\(MMSSTimeFormattor(seconds: totatTime))"
-                            )
-                            .padding(10)
-                            .foregroundStyle(Color("Beige"))
+                            }
                         }
                     }
                 }
@@ -278,8 +282,14 @@ struct PlayBack: View {
 
 class SpectrogramGenerator {
     
+    var decimationFactor: Int
+    
+    init(decimationFactor: Int){
+        self.decimationFactor = decimationFactor
+    }
+    
     func getSpectogramData(url: URL) -> [Double]{
-        return downsample(convertAudioFileToPCMInt16(url: url), decimationFactor: 4000)
+        return downsample(convertAudioFileToPCMInt16(url: url), decimationFactor: decimationFactor)
     }
     
     private func convertAudioFileToPCMInt16(url: URL) -> [Int16] {
@@ -338,4 +348,45 @@ struct DataPoint : Identifiable{
     let magnitude : Double
     var visibility : Bool = false
     let id = UUID()
+}
+
+extension AVAsset{
+    func audioBufferAndSampleCounts() -> (bufferCount:Int, sampleCount:Int) {
+        
+        let outputSettings = [
+            AVFormatIDKey: Int(kAudioFormatLinearPCM) as AnyObject,
+            AVLinearPCMBitDepthKey: 16 as AnyObject,
+            AVLinearPCMIsBigEndianKey: false as AnyObject,
+            AVLinearPCMIsFloatKey: false as AnyObject,
+            AVNumberOfChannelsKey: 1 as AnyObject,
+            AVLinearPCMIsNonInterleaved: false as AnyObject]
+        
+        var sampleCount:Int = 0
+        var bufferCount:Int = 0
+        
+        guard let audioTrack = self.tracks(withMediaType: .audio).first else {
+            return (bufferCount, sampleCount)
+        }
+        
+        if let audioReader = try? AVAssetReader(asset: self)  {
+            
+            let audioReaderOutput = AVAssetReaderTrackOutput(track: audioTrack, outputSettings: outputSettings)
+            audioReader.add(audioReaderOutput)
+            
+            if audioReader.startReading() {
+                
+                while audioReader.status == .reading {
+                    if let sampleBuffer = audioReaderOutput.copyNextSampleBuffer() {
+                        sampleCount += sampleBuffer.numSamples
+                        bufferCount += 1
+                    }
+                    else {
+                        audioReader.cancelReading()
+                    }
+                }
+            }
+        }
+        
+        return (bufferCount, sampleCount)
+    }
 }
