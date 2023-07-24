@@ -235,7 +235,7 @@ struct PlayBack: View {
                     currentTime = player.currentTime/player.duration
                     isPlaying = player.isPlaying
                 }
-                withAnimation(.snappy){
+                withAnimation(.easeInOut){
                     spectogramData[linesCompleted].visibility = true
                     linesCompleted += 1
                     if linesCompleted >= spectogramData.count{
