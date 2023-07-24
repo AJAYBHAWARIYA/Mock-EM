@@ -384,8 +384,8 @@
 				INFOPLIST_FILE = "Mock'EM MessagesExtension/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Mock'EM";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
-				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "To record user's voice, which will be used to get transcript using speech recognition.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "To convert audio to text for deepfake output audio.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -412,8 +412,8 @@
 				INFOPLIST_FILE = "Mock'EM MessagesExtension/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Mock'EM";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
-				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "To record user's voice, which will be used to get transcript using speech recognition.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "To convert audio to text for deepfake output audio.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -438,8 +438,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = JYRFTDT9N6;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
-				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "To record user's voice, which will be used to get transcript using speech recognition.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "To convert audio to text for deepfake output audio.";
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -461,8 +461,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = JYRFTDT9N6;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
-				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "To record user's voice, which will be used to get transcript using speech recognition.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "To convert audio to text for deepfake output audio.";
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
