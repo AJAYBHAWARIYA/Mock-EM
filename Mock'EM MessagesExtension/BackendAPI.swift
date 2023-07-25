@@ -77,9 +77,16 @@ class backendAPI {
             response = res as! HTTPURLResponse
         }
         let decodedResponse = try? JSONDecoder().decode(voices.self, from: data)
-        var filteredVoices = (decodedResponse?.models.filter { voice in getRatings(voice) >= 3.2 })!
-        filteredVoices.sort{(s1, s2) in getRatings(s1) > getRatings(s2)}
-        return filteredVoices
+        var filteredByRating = (decodedResponse?.models.filter { voice in getRatings(voice) >= 3.2 })!
+        var filteredByName = (filteredByRating.filter {
+            voice in
+            !(voice.title.contains("test") ||
+            voice.title.contains("Test") ||
+            voice.title.contains("Testing") ||
+            voice.title.contains("testing"))
+        })
+        filteredByName.sort{(s1, s2) in getRatings(s1) > getRatings(s2)}
+        return filteredByName
     }
     
     func getQueue() async throws -> Int {

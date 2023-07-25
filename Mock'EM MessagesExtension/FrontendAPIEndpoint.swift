@@ -14,7 +14,7 @@ class FrontendAPIEndpoint : ObservableObject {
     @Published var pickerSelect: voice = voice(model_token: "", title: "", user_ratings: rating(positive_count: 0, total_count: 0))
     @Published var inferenceToken: String = ""
     @Published var pollObj: pollParams = pollParams()
-    @Published private(set) var queue: Int = 0
+    @Published private(set) var queue: Int = -1
     
     func getVoices(){
         Task{

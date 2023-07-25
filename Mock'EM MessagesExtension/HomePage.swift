@@ -259,6 +259,7 @@ struct HomePage: View {
                                 .font(.system(size: 45))
                                 .padding(.horizontal, 40)
                                 .onTapGesture {
+                                    requestPresentationStyle(.expanded)
                                     showTextInput.toggle()
                                 }
                             
@@ -269,6 +270,7 @@ struct HomePage: View {
                                 .font(.system(size: 40))
                                 .padding(.horizontal, 40)
                                 .onTapGesture{
+                                    requestPresentationStyle(.expanded)
                                     showRecordAnim.toggle()
                                 }
                             
@@ -278,7 +280,7 @@ struct HomePage: View {
                     
                     Spacer()
                     
-                    if(FrontendObj.queue >= 200){
+                    if(FrontendObj.queue >= 200 || FrontendObj.queue < 0){
                         Text("Server is Loaded. Cannot process the request at the moment")
                             .font(.system(.title2, design: .rounded))
                             .foregroundStyle(Color("MEWarning"))
@@ -291,14 +293,15 @@ struct HomePage: View {
                         Spacer()
                         
                         Button{
+                            requestPresentationStyle(.expanded)
                             pageState = .progress
                         } label: {
                             Image(systemName: "arrow.up.circle.fill")
                                 .font(.system(size:60))
                         }
-                        .disabled(tts.isEmpty || FrontendObj.queue >= 200 || FrontendObj.names.isEmpty)
+                        .disabled(tts.isEmpty || FrontendObj.queue >= 200 || FrontendObj.queue < 0 || FrontendObj.names.isEmpty)
                         .foregroundStyle(
-                            tts.isEmpty || FrontendObj.queue >= 200 || FrontendObj.names.isEmpty ?
+                            tts.isEmpty || FrontendObj.queue >= 200 || FrontendObj.queue < 0 || FrontendObj.names.isEmpty ?
                             Color("Disabled"):
                                 Color.purple
                         )
@@ -312,7 +315,7 @@ struct HomePage: View {
                             Text("Credits")
                         }
                         .foregroundStyle(Color(white: 0.7))
-                        .offset(x: 0, y: 15)
+                        .offset(x: 0, y: 5)
                         .padding(.trailing, 10)
                         .onTapGesture{
                             withAnimation(.easeIn){
