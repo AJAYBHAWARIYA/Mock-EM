@@ -77,7 +77,7 @@ class backendAPI {
             response = res as! HTTPURLResponse
         }
         let decodedResponse = try? JSONDecoder().decode(voices.self, from: data)
-        var filteredByRating = (decodedResponse?.models.filter { voice in getRatings(voice) >= 3.2 })!
+        let filteredByRating = (decodedResponse?.models.filter { voice in getRatings(voice) >= 3.2 })!
         var filteredByName = (filteredByRating.filter {
             voice in
             !(voice.title.contains("test") ||
