@@ -50,7 +50,9 @@ class backendAPI {
     private let ttsUrl = URL(string:"https://api.fakeyou.com/tts/inference")!
     private let pollBaseUrl = "https://api.fakeyou.com/tts/job/"
     private let queueUrl = URL(string: "https://api.fakeyou.com/tts/queue_length")!
+//    private let loginUrl = URL(string: "https://api.fakeyou.com/login")!
     private let WAIT_COUNT = 30
+    private var sessionCookie = "session=eyJhbGciOiJIUzI1NiJ9.eyJjb29raWVfdmVyc2lvbiI6IjIiLCJzZXNzaW9uX3Rva2VuIjoiU0VTU0lPTjpiaHQ3cmYwdGt0d2g3d2JjN3ZkMGZoYTYiLCJ1c2VyX3Rva2VuIjoiVTo3UlZaS0tTRDkxUFhNIn0.B6BAAI9fzCPKob3SUVkA-O5vdCmmcPFiY_HyIsNEL98"
     
     private func getRatings(_ voice: voice) -> Double{
         if (voice.user_ratings.total_count == 0){
@@ -68,8 +70,33 @@ class backendAPI {
         return (round(rating*10.0))/10.0
     }
     
+//    func login() async throws{
+//        let params = ["username_or_email": "MayJayDevs", "password": "cymVom-qukdih-2tyjsu"]
+//        guard let encoded = try? JSONEncoder().encode(params) else {
+//            return
+//        }
+//        
+//        var request = URLRequest(url: loginUrl)
+//        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+//        request.httpMethod = "POST"
+//        
+//        let (_, res) = try await URLSession.shared.upload(for: request, from: encoded)
+//        var response = res as! HTTPURLResponse
+//        if(response.statusCode == 200 || response.statusCode == 201){
+//            sessionCookie = response.value(forHTTPHeaderField: "set-cookie")!
+//        }
+//        else{
+//            sessionCookie = "Cookies not found"
+//        }
+//    }
+    
     func getVoices() async throws -> [voice]? {
-        var (data, res) = try await URLSession.shared.data(from: listUrl)
+        var request = URLRequest(url: listUrl)
+        request.setValue(sessionCookie, forHTTPHeaderField: "cookie")
+        request.setValue("include", forHTTPHeaderField: "credentials")
+        request.httpMethod = "GET"
+        
+        var (data, res) = try await URLSession.shared.data(for: request)
         var response = res as! HTTPURLResponse
         while (!(response.statusCode == 200 || response.statusCode == 201)){
             try await Task.sleep(nanoseconds: 2_000_000_000)
@@ -90,7 +117,12 @@ class backendAPI {
     }
     
     func getQueue() async throws -> Int {
-        var (data, res) = try await URLSession.shared.data(from: queueUrl)
+        var request = URLRequest(url: queueUrl)
+        request.setValue(sessionCookie, forHTTPHeaderField: "cookie")
+        request.setValue("include", forHTTPHeaderField: "credentials")
+        request.httpMethod = "GET"
+        
+        var (data, res) = try await URLSession.shared.data(for: request)
         var response = res as! HTTPURLResponse
         while (!(response.statusCode == 200 || response.statusCode == 201)){
             try await Task.sleep(nanoseconds: 2_000_000_000)
@@ -112,7 +144,9 @@ class backendAPI {
         
         var request = URLRequest(url: ttsUrl)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Basic SAPI:AK_C04F7EF9060205", forHTTPHeaderField: "Authorization")
+        request.setValue(sessionCookie, forHTTPHeaderField: "cookie")
+        request.setValue("include", forHTTPHeaderField: "credentials")
+//        request.setValue("Basic SAPI:AK_C04F7EF9060205", forHTTPHeaderField: "Authorization")
         request.httpMethod = "POST"
         
         var (data, res) = try await URLSession.shared.upload(for: request, from: encoded)
@@ -135,7 +169,9 @@ class backendAPI {
         
         var request = URLRequest(url: pollUrl)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Basic SAPI:AK_C04F7EF9060205", forHTTPHeaderField: "Authorization")
+        request.setValue(sessionCookie, forHTTPHeaderField: "cookie")
+        request.setValue("include", forHTTPHeaderField: "credentials")
+//        request.setValue("Basic SAPI:AK_C04F7EF9060205", forHTTPHeaderField: "Authorization")
         request.httpMethod = "GET"
         
         var (data, res) = try await URLSession.shared.data(for: request)

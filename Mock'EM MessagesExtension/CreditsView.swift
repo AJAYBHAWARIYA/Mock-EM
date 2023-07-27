@@ -49,7 +49,7 @@ struct CreditsView: View {
                             .padding(.bottom, 5)
                         Text("3. Adding \".\" after a text is a good practice and some voice generators produce better results.")
                             .padding(.bottom, 5)
-                        Text("4. The generated voice is only limited to 12 seconds.")
+                        Text("4. The generated voice is only limited to 1 minute.")
                             .padding(.bottom, 5)
                         Text("5. Due to the high volume of users, some requests take longer to produce results.")
                             .padding(.bottom, 5)

@@ -280,7 +280,7 @@ struct HomePage: View {
                     
                     Spacer()
                     
-                    if(FrontendObj.queue >= 200 || FrontendObj.queue < 0){
+                    if(FrontendObj.queue >= 6000 || FrontendObj.queue < 0){
                         Text("Server is Loaded. Cannot process the request at the moment")
                             .font(.system(.title2, design: .rounded))
                             .foregroundStyle(Color("MEWarning"))
@@ -299,9 +299,9 @@ struct HomePage: View {
                             Image(systemName: "arrow.up.circle.fill")
                                 .font(.system(size:60))
                         }
-                        .disabled(tts.isEmpty || FrontendObj.queue >= 200 || FrontendObj.queue < 0 || FrontendObj.names.isEmpty)
+                        .disabled(tts.isEmpty || FrontendObj.queue >= 6000 || FrontendObj.queue < 0 || FrontendObj.names.isEmpty)
                         .foregroundStyle(
-                            tts.isEmpty || FrontendObj.queue >= 200 || FrontendObj.queue < 0 || FrontendObj.names.isEmpty ?
+                            tts.isEmpty || FrontendObj.queue >= 6000 || FrontendObj.queue < 0 || FrontendObj.names.isEmpty ?
                             Color("Disabled"):
                                 Color.purple
                         )
@@ -325,11 +325,12 @@ struct HomePage: View {
                     }
                 }
                 else if(pageState == .progress){
-                    if(FrontendObj.queue >= 120 && FrontendObj.queue < 200){
+                    if(FrontendObj.queue >= 3000 && FrontendObj.queue < 6000){
                         Text("Server is Loaded. Might take a while to serve your request")
                             .font(.system(.title2, design: .rounded))
                             .foregroundStyle(Color("MEWarning"))
                             .padding(.vertical, 10)
+                            .multilineTextAlignment(.center)
                     }
                     ProgressAnim()
                         .onAppear{

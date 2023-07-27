@@ -14,8 +14,8 @@ struct QueueComponent: View{
     
     var body: some View{
         RoundedRectangle(cornerRadius: 12)
-            .stroke(frontendObj.queue < 0 ? Color("MEWarning") : frontendObj.queue <= 60 ? Color("MEGreen") :
-                        frontendObj.queue <= 120 ? Color("MEYellow") :
+            .stroke(frontendObj.queue < 0 ? Color("MEWarning") : frontendObj.queue <= 3000 ? Color("MEGreen") :
+                        frontendObj.queue <= 6000 ? Color("MEYellow") :
                         Color("MEWarning"), style:StrokeStyle(lineWidth:3))
             .foregroundStyle(Color("AppBackground"))
             .frame(maxWidth: 120, maxHeight: 40)
