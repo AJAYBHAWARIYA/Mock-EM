@@ -26,8 +26,7 @@ class Recording:  NSObject, ObservableObject, AVAudioPlayerDelegate {
             
             let audioSession = AVAudioSession.sharedInstance()
             do{
-                try audioSession.setCategory(.playAndRecord)
-                try audioSession.overrideOutputAudioPort(.speaker)
+                try audioSession.setCategory(.record)
                 try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
             } catch {
                 print("CANNOT SETUP THE AUDIO SESSION")

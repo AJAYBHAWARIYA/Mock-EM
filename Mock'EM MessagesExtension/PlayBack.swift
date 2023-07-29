@@ -61,6 +61,14 @@ struct PlayBack: View {
         
         url = cacheURL.appendingPathComponent(fileName, conformingTo: .wav)
         
+        let audioSession = AVAudioSession.sharedInstance()
+        do{
+            try audioSession.setCategory(.playback)
+            try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+        } catch {
+            print("CANNOT SETUP THE PLAYBACK AUDIO SESSION")
+        }
+        
         if(!FileManager.default.fileExists(atPath: url.absoluteString)){
             URLSession.shared.dataTask(with: URL(string: link)!) {
                 data, response, error in
